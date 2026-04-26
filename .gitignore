@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# planilhas pessoais (não versionar dados)
+*.xlsx
+*.xls
+*.csv
+
+# screenshots locais de teste
+/scripts/*.png
+/tmp-*.png
