@@ -98,16 +98,16 @@ export function CalendarView({ lines, entries, year, month }: Props) {
 
   return (
     <>
-      <div className="p-3 sm:p-6 flex flex-col gap-3 max-w-3xl w-full mx-auto">
-        <h2 className="text-sm font-semibold capitalize text-muted-foreground px-1">
+      <div className="px-3 sm:px-6 lg:px-8 py-3 lg:py-6 flex flex-col gap-3 max-w-6xl w-full mx-auto">
+        <h2 className="lg:hidden text-sm font-semibold capitalize text-muted-foreground px-1">
           {monthLabelLong(year, month)}
         </h2>
 
-        <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden border">
+        <div className="grid grid-cols-7 gap-px bg-border rounded-lg lg:rounded-2xl overflow-hidden border">
           {WEEKDAYS_PT.map((w) => (
             <div
               key={w}
-              className="bg-muted/40 text-[10px] sm:text-xs font-medium text-muted-foreground text-center py-1.5"
+              className="bg-muted/40 text-[10px] sm:text-xs lg:text-sm font-medium text-muted-foreground text-center py-1.5 lg:py-2.5"
             >
               {w}
             </div>
@@ -115,12 +115,14 @@ export function CalendarView({ lines, entries, year, month }: Props) {
 
           {cells.map((cell, idx) => {
             if (!cell.inMonth || cell.day === null) {
-              return <div key={idx} className="bg-background min-h-[72px]" />;
+              return <div key={idx} className="bg-background min-h-[72px] lg:min-h-[120px]" />;
             }
             const day = cell.day;
             const linesOnDay = linesByDay.get(day) ?? [];
             const { total } = dayTotal(day);
             const today = isToday(day);
+            const visibleChips = 2;
+            const visibleChipsLg = 4;
 
             return (
               <button
@@ -129,13 +131,13 @@ export function CalendarView({ lines, entries, year, month }: Props) {
                 onClick={() => linesOnDay.length > 0 && setOpenDay(day)}
                 disabled={linesOnDay.length === 0}
                 className={cn(
-                  "bg-background relative text-left p-1 sm:p-1.5 min-h-[72px] sm:min-h-[88px] flex flex-col gap-0.5",
-                  linesOnDay.length > 0 && "active:bg-accent/50 cursor-pointer",
+                  "bg-background relative text-left p-1 sm:p-1.5 lg:p-2 min-h-[72px] sm:min-h-[88px] lg:min-h-[120px] flex flex-col gap-0.5 lg:gap-1",
+                  linesOnDay.length > 0 && "active:bg-accent/50 hover:bg-accent/30 cursor-pointer",
                 )}
               >
                 <span
                   className={cn(
-                    "text-[11px] sm:text-xs font-semibold tabular-nums w-5 h-5 flex items-center justify-center rounded-full",
+                    "text-[11px] sm:text-xs lg:text-sm font-semibold tabular-nums w-5 h-5 lg:w-6 lg:h-6 flex items-center justify-center rounded-full",
                     today
                       ? "bg-primary text-primary-foreground"
                       : "text-foreground",
@@ -145,7 +147,7 @@ export function CalendarView({ lines, entries, year, month }: Props) {
                 </span>
 
                 <div className="flex flex-col gap-0.5 flex-1 min-h-0">
-                  {linesOnDay.slice(0, 2).map((l) => {
+                  {linesOnDay.map((l, i) => {
                     const e = entryByLine.get(l.id);
                     const color = categoryColor(l.category);
                     const isPaid = !!e?.paidAt;
@@ -154,10 +156,14 @@ export function CalendarView({ lines, entries, year, month }: Props) {
                       <div
                         key={l.id}
                         className={cn(
-                          "flex items-center gap-1 text-[10px] sm:text-[11px] px-1 py-0.5 rounded truncate",
+                          "flex items-center gap-1 text-[10px] sm:text-[11px] lg:text-xs px-1 lg:px-1.5 py-0.5 rounded truncate",
                           color?.soft ?? "bg-muted",
                           color?.text ?? "text-foreground",
-                          isPaid && "opacity-60 line-through",
+                          isPaid && "opacity-60",
+                          // limita os chips por breakpoint
+                          i >= visibleChips && "hidden",
+                          i >= visibleChipsLg && "lg:hidden",
+                          i < visibleChipsLg && "lg:flex",
                         )}
                       >
                         {isCard ? (
@@ -169,15 +175,25 @@ export function CalendarView({ lines, entries, year, month }: Props) {
                       </div>
                     );
                   })}
-                  {linesOnDay.length > 2 ? (
-                    <div className="text-[10px] text-muted-foreground px-1">
-                      +{linesOnDay.length - 2}
+                  {linesOnDay.length > visibleChips ? (
+                    <div
+                      className={cn(
+                        "text-[10px] text-muted-foreground px-1",
+                        linesOnDay.length <= visibleChipsLg && "lg:hidden",
+                      )}
+                    >
+                      +{linesOnDay.length - visibleChips}
+                    </div>
+                  ) : null}
+                  {linesOnDay.length > visibleChipsLg ? (
+                    <div className="hidden lg:block text-[10px] text-muted-foreground px-1">
+                      +{linesOnDay.length - visibleChipsLg}
                     </div>
                   ) : null}
                 </div>
 
                 {total > 0 && linesOnDay.length > 0 ? (
-                  <span className="text-[9px] sm:text-[10px] tabular-nums text-muted-foreground mt-auto">
+                  <span className="text-[9px] sm:text-[10px] lg:text-[11px] tabular-nums text-muted-foreground mt-auto">
                     {formatBRL(total)}
                   </span>
                 ) : null}
@@ -197,7 +213,16 @@ export function CalendarView({ lines, entries, year, month }: Props) {
           if (!open) setOpenDay(null);
         }}
       >
-        <SheetContent side="bottom" className="max-h-[85vh] flex flex-col">
+        <SheetContent
+          side="bottom"
+          className={cn(
+            "max-h-[85vh] flex flex-col rounded-t-2xl",
+            // desktop: vira modal centralizado
+            "sm:w-[42rem]! sm:max-w-[calc(100vw-2rem)]! sm:max-h-[80vh]! sm:rounded-2xl! sm:border!",
+            "sm:left-1/2! sm:right-auto! sm:bottom-auto! sm:top-1/2!",
+            "sm:translate-x-[-50%]! sm:translate-y-[-50%]!",
+          )}
+        >
           <SheetHeader>
             <SheetTitle>
               Dia {openDay} · {monthLabelLong(year, month)}
@@ -208,7 +233,7 @@ export function CalendarView({ lines, entries, year, month }: Props) {
               neste dia
             </SheetDescription>
           </SheetHeader>
-          <div className="overflow-y-auto -mx-6">
+          <div className="overflow-y-auto">
             {linesForOpen.map((line) => (
               <ExpenseRow
                 key={line.id}

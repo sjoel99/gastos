@@ -80,8 +80,8 @@ export function ExpenseRow({ line, entry, year, month }: Props) {
           }
         }}
         className={cn(
-          "flex items-center gap-3 px-4 py-3 border-b border-border/60 last:border-b-0 min-h-16 cursor-pointer transition-colors",
-          "active:bg-accent/40 hover:bg-accent/30",
+          "flex items-center gap-3 px-4 py-3 border-b border-border/60 last:border-b-0 min-h-16 cursor-pointer transition-colors outline-none",
+          "active:bg-accent/40 hover:bg-accent/30 focus-visible:bg-accent/40",
           isCard && "bg-muted/40",
         )}
       >

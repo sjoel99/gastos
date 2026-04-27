@@ -135,8 +135,8 @@ export function MonthView({ lines, entries, year, month }: Props) {
   }
 
   return (
-    <div className="px-4 sm:px-6 py-4 flex flex-col gap-4 max-w-2xl w-full mx-auto">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-purple-900 text-primary-foreground shadow-lg shadow-primary/20">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 lg:py-6 max-w-6xl w-full mx-auto flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-8 lg:items-start">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-purple-900 text-primary-foreground shadow-lg shadow-primary/20 lg:sticky lg:top-6">
         <div
           aria-hidden
           className="absolute -top-16 -right-12 size-52 rounded-full bg-white/10 blur-2xl"
@@ -202,8 +202,9 @@ export function MonthView({ lines, entries, year, month }: Props) {
         </div>
       </div>
 
+      <div className="flex flex-col gap-4 lg:gap-5 min-w-0">
       {VAPID_PUBLIC ? (
-        <div className="flex justify-end -mb-1">
+        <div className="flex justify-end">
           <EnableNotificationsButton vapidPublicKey={VAPID_PUBLIC} />
         </div>
       ) : null}
@@ -320,6 +321,7 @@ export function MonthView({ lines, entries, year, month }: Props) {
             />
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

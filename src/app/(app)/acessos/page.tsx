@@ -8,7 +8,7 @@ export default async function AcessosPage() {
   const currentEmail = session?.user?.email?.toLowerCase() ?? "";
 
   return (
-    <div className="p-4 sm:p-6 max-w-2xl w-full mx-auto flex flex-col gap-5">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl w-full mx-auto flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <h1 className="hidden md:block text-2xl font-semibold tracking-tight">
           Acessos

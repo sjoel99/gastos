@@ -10,6 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import { ExpenseLineForm } from "./expense-line-form";
 
 type Props = {
@@ -62,7 +63,12 @@ export function AddExpenseButton({
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="bottom"
-          className="max-h-[92vh] sm:max-w-md sm:mx-auto rounded-t-2xl flex flex-col gap-0 p-0"
+          className={cn(
+            "max-h-[92vh] flex flex-col gap-0 p-0 rounded-t-2xl",
+            "sm:max-w-lg! sm:max-h-[88vh]! sm:rounded-2xl! sm:border!",
+            "sm:left-1/2! sm:right-auto! sm:bottom-auto! sm:top-1/2!",
+            "sm:translate-x-[-50%]! sm:translate-y-[-50%]!",
+          )}
         >
           <SheetHeader className="px-4 pt-4 pb-3 border-b">
             <SheetTitle>Nova despesa</SheetTitle>

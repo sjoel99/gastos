@@ -304,7 +304,12 @@ export function CellEditor({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="max-h-[92vh] sm:max-w-md sm:mx-auto rounded-t-2xl flex flex-col gap-0 p-0"
+        className={cn(
+          "max-h-[92vh] flex flex-col gap-0 p-0 rounded-t-2xl",
+          "sm:max-w-md! sm:max-h-[85vh]! sm:rounded-2xl! sm:border!",
+          "sm:left-1/2! sm:right-auto! sm:bottom-auto! sm:top-1/2!",
+          "sm:translate-x-[-50%]! sm:translate-y-[-50%]!",
+        )}
       >
         {line ? (
           <>

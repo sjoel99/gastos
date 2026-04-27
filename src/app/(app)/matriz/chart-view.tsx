@@ -81,7 +81,7 @@ export function ChartView({ lines, entries, year }: Props) {
   const barWidth = (innerW - barGap * 11) / 12;
 
   return (
-    <div className="px-4 sm:px-6 py-4 flex flex-col gap-4 max-w-3xl w-full mx-auto">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 lg:py-6 flex flex-col gap-4 lg:gap-6 max-w-6xl w-full mx-auto">
       <div className="rounded-3xl bg-gradient-to-br from-primary via-primary to-purple-900 text-primary-foreground shadow-lg shadow-primary/20 p-6 flex flex-col gap-1.5">
         <span className="text-xs font-medium opacity-75 tracking-wide">
           Total {year}

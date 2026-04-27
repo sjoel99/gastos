@@ -49,18 +49,18 @@ export function AppHeader({ userEmail }: { userEmail?: string | null }) {
   const active = activeTabId(pathname, search.get("view"));
 
   return (
-    <header className="hidden md:block sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-      <div className="px-6 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-            <Calendar className="size-5" />
+    <header className="hidden md:block sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur-md">
+      <div className="px-6 lg:px-8 h-14 max-w-6xl mx-auto flex items-center justify-between gap-4">
+        <Link href="/matriz?view=mes" className="flex items-center gap-2.5 group">
+          <div className="size-8 rounded-lg bg-gradient-to-br from-primary to-purple-700 text-primary-foreground flex items-center justify-center shadow-sm shadow-primary/30">
+            <Calendar className="size-4" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight">
-            Gastos Mensais
+          <h1 className="font-bold tracking-tight group-hover:text-primary transition-colors">
+            Gastos
           </h1>
-        </div>
+        </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-0.5 bg-muted/60 rounded-full p-1">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = active === tab.id;
@@ -69,10 +69,10 @@ export function AppHeader({ userEmail }: { userEmail?: string | null }) {
                 key={tab.id}
                 href={tab.href}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm whitespace-nowrap transition-colors",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all",
                   isActive
-                    ? "bg-accent text-accent-foreground font-medium"
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                    ? "bg-background text-foreground font-semibold shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Icon className="size-4" />
@@ -82,13 +82,15 @@ export function AppHeader({ userEmail }: { userEmail?: string | null }) {
           })}
         </nav>
 
-        <div className="flex items-center gap-3 pl-3 border-l">
+        <div className="flex items-center gap-1">
           {userEmail ? (
-            <span className="text-xs text-muted-foreground">{userEmail}</span>
+            <span className="text-xs text-muted-foreground mr-2 hidden lg:inline">
+              {userEmail}
+            </span>
           ) : null}
           <Link
             href="/acessos"
-            className="text-muted-foreground hover:text-foreground"
+            className="size-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Acessos"
             title="Gerenciar acessos"
           >
@@ -97,7 +99,7 @@ export function AppHeader({ userEmail }: { userEmail?: string | null }) {
           <form action="/api/auth/signout" method="POST">
             <button
               type="submit"
-              className="text-muted-foreground hover:text-foreground"
+              className="size-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               aria-label="Sair"
             >
               <LogOut className="size-4" />
