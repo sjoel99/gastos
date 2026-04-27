@@ -9,14 +9,21 @@ const brlSigned = new Intl.NumberFormat("pt-BR", {
   signDisplay: "exceptZero",
 });
 
+// O ICU do Node usa NARROW NO-BREAK SPACE (U+202F) entre "R$" e o valor;
+// alguns ambientes do browser usam outro caractere — daí hydration mismatch.
+// Normaliza para um espaço comum.
+function normalize(s: string): string {
+  return s.replace(/[  ]/g, " ");
+}
+
 export function formatBRL(cents: number | null | undefined): string {
   if (cents === null || cents === undefined) return "—";
-  return brl.format(cents / 100);
+  return normalize(brl.format(cents / 100));
 }
 
 export function formatBRLSigned(cents: number | null | undefined): string {
   if (cents === null || cents === undefined) return "—";
-  return brlSigned.format(cents / 100);
+  return normalize(brlSigned.format(cents / 100));
 }
 
 /** Converte string com vírgula ou ponto para centavos. Aceita negativo. */
