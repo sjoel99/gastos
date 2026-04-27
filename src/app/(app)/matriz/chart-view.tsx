@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { formatBRL } from "@/lib/money";
 import { MONTHS_PT, monthLabelLong } from "@/lib/dates";
 import { cn } from "@/lib/utils";
+import { MonthFlowSheet } from "./month-flow-sheet";
 import type { ExpenseLine, MonthlyEntry } from "@/db/schema";
 
 type Props = {
@@ -32,6 +36,7 @@ function entryValueCents(line: ExpenseLine, entry: MonthlyEntry | undefined) {
 }
 
 export function ChartView({ lines, entries, year }: Props) {
+  const [openMonth, setOpenMonth] = useState<number | null>(null);
   const linesById = new Map(lines.map((l) => [l.id, l]));
 
   const buckets: MonthBucket[] = Array.from({ length: 12 }, (_, i) => ({
@@ -159,16 +164,28 @@ export function ChartView({ lines, entries, year }: Props) {
               const cardH = (b.cardCents / maxMonthly) * innerH;
               const baseY = padTop + innerH;
 
+              const clickable = positive > 0;
               return (
-                <g key={b.month}>
-                  {positive > 0 ? (
+                <g
+                  key={b.month}
+                  onClick={clickable ? () => setOpenMonth(b.month) : undefined}
+                  className={clickable ? "cursor-pointer" : undefined}
+                >
+                  {clickable ? (
                     <>
+                      <rect
+                        x={x - 1}
+                        y={padTop}
+                        width={barWidth + 2}
+                        height={innerH}
+                        fill="transparent"
+                      />
                       <rect
                         x={x}
                         y={baseY - cardH}
                         width={barWidth}
                         height={cardH}
-                        className="fill-muted-foreground/40"
+                        className="fill-muted-foreground/40 group-hover:opacity-90"
                         rx={2}
                       />
                       <rect
@@ -188,10 +205,7 @@ export function ChartView({ lines, entries, year }: Props) {
                         rx={2}
                       />
                       <title>
-                        {monthLabelLong(year, b.month)}: {formatBRL(total)}
-                        {"\n"}Pago {formatBRL(b.paidCents)} · Pendente{" "}
-                        {formatBRL(b.pendingCents)} · Cartão −
-                        {formatBRL(b.cardCents)}
+                        {`${monthLabelLong(year, b.month)}: ${formatBRL(total)}\nPago ${formatBRL(b.paidCents)} · Pendente ${formatBRL(b.pendingCents)} · Cartão −${formatBRL(b.cardCents)}\nClique para ver o fluxo`}
                       </title>
                     </>
                   ) : null}
@@ -222,46 +236,71 @@ export function ChartView({ lines, entries, year }: Props) {
           {buckets.map((b, i) => {
             const total = monthlyTotals[i];
             const positive = monthlyPositives[i];
+            const clickable = positive > 0;
             return (
               <li
                 key={b.month}
-                className="flex items-center justify-between gap-3 px-5 py-2.5 border-b border-border/60 last:border-b-0 text-sm"
+                className="border-b border-border/60 last:border-b-0"
               >
-                <span className="capitalize text-muted-foreground w-16 shrink-0">
-                  {MONTHS_PT[i]}
-                </span>
-                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden flex">
-                  {positive > 0 ? (
-                    <>
-                      <div
-                        className="bg-emerald-500"
-                        style={{
-                          width: `${(b.paidCents / maxMonthly) * 100}%`,
-                        }}
-                      />
-                      <div
-                        className="bg-primary"
-                        style={{
-                          width: `${(b.pendingCents / maxMonthly) * 100}%`,
-                        }}
-                      />
-                      <div
-                        className="bg-muted-foreground/40"
-                        style={{
-                          width: `${(b.cardCents / maxMonthly) * 100}%`,
-                        }}
-                      />
-                    </>
-                  ) : null}
-                </div>
-                <span className="tabular-nums font-semibold w-24 text-right shrink-0">
-                  {positive > 0 ? formatBRL(total) : "—"}
-                </span>
+                <button
+                  type="button"
+                  onClick={
+                    clickable ? () => setOpenMonth(b.month) : undefined
+                  }
+                  disabled={!clickable}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-5 py-2.5 text-sm text-left",
+                    clickable && "hover:bg-accent/40 cursor-pointer",
+                    !clickable && "cursor-default",
+                  )}
+                >
+                  <span className="capitalize text-muted-foreground w-16 shrink-0">
+                    {MONTHS_PT[i]}
+                  </span>
+                  <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden flex">
+                    {positive > 0 ? (
+                      <>
+                        <div
+                          className="bg-emerald-500"
+                          style={{
+                            width: `${(b.paidCents / maxMonthly) * 100}%`,
+                          }}
+                        />
+                        <div
+                          className="bg-primary"
+                          style={{
+                            width: `${(b.pendingCents / maxMonthly) * 100}%`,
+                          }}
+                        />
+                        <div
+                          className="bg-muted-foreground/40"
+                          style={{
+                            width: `${(b.cardCents / maxMonthly) * 100}%`,
+                          }}
+                        />
+                      </>
+                    ) : null}
+                  </div>
+                  <span className="tabular-nums font-semibold w-24 text-right shrink-0">
+                    {positive > 0 ? formatBRL(total) : "—"}
+                  </span>
+                </button>
               </li>
             );
           })}
         </ul>
       </div>
+
+      <MonthFlowSheet
+        open={openMonth !== null}
+        onOpenChange={(open) => {
+          if (!open) setOpenMonth(null);
+        }}
+        year={year}
+        month={openMonth}
+        lines={lines}
+        entries={entries}
+      />
     </div>
   );
 }

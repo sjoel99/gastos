@@ -29,7 +29,7 @@ export function ExpenseRow({ line, entry, year, month }: Props) {
   const isNegative = display < 0;
   const isCard = entry?.paidWithCard ?? line.defaultPaidWithCard;
   const effectiveDueDay = entry?.dueDay ?? line.dueDay;
-  const { Icon, bg, fg } = expenseIcon(line.name);
+  const { Icon, bg, fg } = expenseIcon(line);
 
   const today = new Date();
   const dueDate = new Date(year, month - 1, Math.min(effectiveDueDay, 28));
