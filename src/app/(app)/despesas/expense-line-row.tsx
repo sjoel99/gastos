@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Archive, ArchiveRestore, CreditCard, Pencil, X } from "lucide-react";
+import { Archive, ArchiveRestore, CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpenseLineForm } from "./expense-line-form";
 import { setArchivedAction } from "./actions";
@@ -28,22 +28,13 @@ export function ExpenseLineRow({ line }: { line: ExpenseLine }) {
 
   if (editing) {
     return (
-      <div className="border rounded-lg p-3 bg-card">
+      <div className="border rounded-lg p-4 bg-card">
         <ExpenseLineForm
           mode="edit"
           initial={line}
           onSaved={() => setEditing(false)}
+          onCancel={() => setEditing(false)}
         />
-        <div className="mt-2 flex justify-end">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setEditing(false)}
-          >
-            <X className="size-4 mr-1" /> Cancelar
-          </Button>
-        </div>
       </div>
     );
   }

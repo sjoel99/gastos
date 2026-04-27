@@ -29,6 +29,7 @@ type Props = {
   defaultStartYear?: number;
   defaultStartMonth?: number;
   onSaved?: () => void;
+  onCancel?: () => void;
 };
 
 const ONGOING_DEFAULT = 60; // mensal contínuo: 5 anos
@@ -39,6 +40,7 @@ export function ExpenseLineForm({
   defaultStartYear,
   defaultStartMonth,
   onSaved,
+  onCancel,
 }: Props) {
   const action = mode === "create" ? createLineAction : updateLineAction;
   const [state, formAction, pending] = useActionState<LineFormState, FormData>(
@@ -247,6 +249,16 @@ export function ExpenseLineForm({
       </label>
 
       <div className="sm:col-span-2 flex justify-end gap-2 pt-1">
+        {onCancel ? (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            className="h-11 px-4"
+          >
+            Cancelar
+          </Button>
+        ) : null}
         <Button type="submit" disabled={pending} className="h-11 px-5">
           {pending ? "..." : mode === "create" ? "Adicionar" : "Salvar"}
         </Button>
