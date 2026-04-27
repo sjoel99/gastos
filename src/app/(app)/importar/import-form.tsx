@@ -55,6 +55,10 @@ export function ImportForm() {
             <li className="tabular-nums font-medium">
               {state.summary.upsertedEntries}
             </li>
+            <li>Categorizadas</li>
+            <li className="tabular-nums font-medium">
+              {state.summary.categorized}
+            </li>
             <li>Total de células</li>
             <li className="tabular-nums font-medium">
               {state.summary.totalCells}

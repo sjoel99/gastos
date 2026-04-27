@@ -1,9 +1,10 @@
 import "server-only";
 
 import * as XLSX from "xlsx";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { expenseLines, monthlyEntries } from "@/db/schema";
+import { expenseCategory } from "@/lib/expense-icons";
 
 // Cabeçalhos / linhas que NÃO são despesas — receitas, saldos, totalizadores.
 const SKIP_NAMES = new Set([
@@ -137,6 +138,7 @@ export type ImportSummary = {
   totalCells: number;
   createdLines: number;
   upsertedEntries: number;
+  categorized: number;
   sheetsProcessed: { name: string; rows: number }[];
 };
 
@@ -203,7 +205,13 @@ export async function importFromXlsxBuffer(
     } else {
       const inserted = await db
         .insert(expenseLines)
-        .values({ name, dueDay, isArchived: false, defaultProjectedCents: 0 })
+        .values({
+          name,
+          dueDay,
+          isArchived: false,
+          defaultProjectedCents: 0,
+          category: expenseCategory(name),
+        })
         .returning({ id: expenseLines.id });
       lineId = inserted[0].id;
       createdLines++;
@@ -245,6 +253,28 @@ export async function importFromXlsxBuffer(
     }
   }
 
+  // Sweep final: categoriza qualquer linha sem categoria via inferência por
+  // nome (mesma lógica de expense-icons.ts). Não toca em quem já tem.
+  const uncategorized = await db
+    .select({ id: expenseLines.id, name: expenseLines.name })
+    .from(expenseLines)
+    .where(or(isNull(expenseLines.category), eq(expenseLines.category, "")));
+  let categorized = 0;
+  for (const l of uncategorized) {
+    const cat = expenseCategory(l.name);
+    if (!cat) continue;
+    await db
+      .update(expenseLines)
+      .set({ category: cat, updatedAt: new Date() })
+      .where(
+        and(
+          eq(expenseLines.id, l.id),
+          or(isNull(expenseLines.category), eq(expenseLines.category, "")),
+        ),
+      );
+    categorized++;
+  }
+
   const totalCells = [...byName.values()].reduce(
     (s, x) => s + x.entries.length,
     0,
@@ -255,6 +285,7 @@ export async function importFromXlsxBuffer(
     totalCells,
     createdLines,
     upsertedEntries,
+    categorized,
     sheetsProcessed,
   };
 }
