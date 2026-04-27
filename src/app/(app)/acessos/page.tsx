@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Upload } from "lucide-react";
 import { auth } from "@/auth";
 import { listAllowedEmails } from "@/lib/allowed-emails";
 import { AccessForm } from "./access-form";
@@ -47,6 +49,21 @@ export default async function AcessosPage() {
           </div>
         )}
       </div>
+
+      <Link
+        href="/importar"
+        className="bg-card rounded-2xl border border-border/60 shadow-sm p-4 flex items-center gap-3 hover:bg-accent/30 transition-colors"
+      >
+        <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <Upload className="size-5" />
+        </div>
+        <div className="flex flex-col min-w-0">
+          <span className="font-semibold text-sm">Importar planilha</span>
+          <span className="text-xs text-muted-foreground">
+            Sobe um .xlsx no formato &ldquo;Gastos Mensais&rdquo;
+          </span>
+        </div>
+      </Link>
     </div>
   );
 }
