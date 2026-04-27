@@ -69,7 +69,7 @@ const MATCHERS: IconMatch[] = [
   { pattern: /streaming|tv|netflix|spot/i, icon: Tv, color: PALETTE.rose, category: "Assinaturas" },
   { pattern: /viagem|airbnb|hotel|passagem/i, icon: Plane, color: PALETTE.sky, category: "Viagem" },
   { pattern: /telefone|celular|tim|claro/i, icon: Phone, color: PALETTE.blue, category: "Internet & Telefone" },
-  { pattern: /m[ãa]e|fam[íi]lia|filh|davi|isa|vivi|joel/i, icon: Smile, color: PALETTE.amber, category: "Família" },
+  { pattern: /m[ãa]e|pai|fam[íi]lia|filh|esposa|marido/i, icon: Smile, color: PALETTE.amber, category: "Família" },
   { pattern: /mercado|compras/i, icon: ShoppingBag, color: PALETTE.green, category: "Mercado" },
   { pattern: /sal[áa]rio|pr[óo]-?labore|dividendo/i, icon: Wallet, color: PALETTE.emerald, category: "Receita" },
 ];

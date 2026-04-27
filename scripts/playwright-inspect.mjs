@@ -1,14 +1,16 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 
-const EMAIL = process.env.LOGIN_EMAIL ?? "sjoel99@gmail.com";
+const EMAIL = process.env.LOGIN_EMAIL;
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-const DEV_LOG =
-  process.env.DEV_LOG ??
-  "/private/tmp/claude-502/-Users-joelsantos-Desenvolvimento-pessoal/edf24091-f13f-48dd-aec3-ebd4b6d07117/tasks/blvnrvkhi.output";
+const DEV_LOG = process.env.DEV_LOG;
+if (!EMAIL) {
+  console.error("LOGIN_EMAIL não definido.");
+  process.exit(1);
+}
 
 function readMagicLinkFromDevLog() {
-  if (!fs.existsSync(DEV_LOG)) return null;
+  if (!DEV_LOG || !fs.existsSync(DEV_LOG)) return null;
   const text = fs.readFileSync(DEV_LOG, "utf-8");
   // Pega o ÚLTIMO link emitido
   const matches = [...text.matchAll(/link:\s+(http[^\s]+)/g)];

@@ -8,17 +8,19 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 
-const EMAIL = process.env.LOGIN_EMAIL ?? "sjoel99@gmail.com";
+const EMAIL = process.env.LOGIN_EMAIL;
 const BASE = process.env.BASE_URL ?? "http://localhost:3001";
-const DEV_LOG =
-  process.env.DEV_LOG ??
-  "/private/tmp/claude-502/-Users-joelsantos-Desenvolvimento-pessoal/edf24091-f13f-48dd-aec3-ebd4b6d07117/tasks/b12lfsia9.output";
+const DEV_LOG = process.env.DEV_LOG;
+if (!EMAIL) {
+  console.error("LOGIN_EMAIL não definido.");
+  process.exit(1);
+}
 const TARGET = process.env.VIEW ?? "/matriz?view=calendario&year=2026&month=4";
 const WIDTH = Number(process.env.W ?? 1440);
 const HEIGHT = Number(process.env.H ?? 900);
 
 function readMagicLink() {
-  if (!fs.existsSync(DEV_LOG)) return null;
+  if (!DEV_LOG && fs.existsSync(DEV_LOG)) return null;
   const text = fs.readFileSync(DEV_LOG, "utf-8");
   const matches = [...text.matchAll(/link:\s+(http[^\s]+)/g)];
   return matches.length > 0 ? matches[matches.length - 1][1] : null;
@@ -34,7 +36,7 @@ const ctx = await browser.newContext({
 const page = await ctx.newPage();
 
 console.log(`→ login com ${EMAIL}`);
-const sizeBefore = fs.existsSync(DEV_LOG) ? fs.statSync(DEV_LOG).size : 0;
+const sizeBefore = DEV_LOG && fs.existsSync(DEV_LOG) ? fs.statSync(DEV_LOG).size : 0;
 await page.goto(`${BASE}/sign-in`, { waitUntil: "networkidle" });
 await page.fill('input[name="email"]', EMAIL);
 await page.click('button[type="submit"]');
@@ -43,7 +45,7 @@ await page.waitForLoadState("networkidle");
 let link = null;
 for (let i = 0; i < 30 && !link; i++) {
   await new Promise((r) => setTimeout(r, 250));
-  if (fs.existsSync(DEV_LOG) && fs.statSync(DEV_LOG).size > sizeBefore) {
+  if (DEV_LOG && fs.existsSync(DEV_LOG) && fs.statSync(DEV_LOG).size > sizeBefore) {
     link = readMagicLink();
   }
 }
