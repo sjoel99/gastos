@@ -235,13 +235,8 @@ function SankeyChart({
 
   const linkPath = sankeyLinkHorizontal<SankeyNode, SankeyLink>();
 
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className="w-full h-auto"
-      role="img"
-      aria-label="Diagrama de fluxo de despesas"
-    >
+  const content = (
+    <>
       <g>
         {layout.links.map((link, i) => {
           const target = link.target as unknown as SankeyNode & {
@@ -310,6 +305,48 @@ function SankeyChart({
           );
         })}
       </g>
-    </svg>
+    </>
+  );
+
+  return (
+    <>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="hidden md:block w-full h-auto"
+        role="img"
+        aria-label="Diagrama de fluxo de despesas"
+      >
+        {content}
+      </svg>
+
+      {/* Mobile: rotacionado 90° pra aproveitar a tela em retrato.
+          O wrapper inverte o aspect-ratio (H/W) e o SVG é dimensionado
+          via container queries (100cqh × 100cqw) antes da rotação. */}
+      <div
+        className="md:hidden relative w-full"
+        style={
+          {
+            aspectRatio: `${H} / ${W}`,
+            containerType: "size",
+          } as React.CSSProperties
+        }
+      >
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label="Diagrama de fluxo de despesas"
+          style={{
+            width: "100cqh",
+            height: "100cqw",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%) rotate(90deg)",
+          }}
+        >
+          {content}
+        </svg>
+      </div>
+    </>
   );
 }
