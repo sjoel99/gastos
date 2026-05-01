@@ -1,13 +1,20 @@
-import { and, asc, between, eq, gte, isNull, sql } from "drizzle-orm";
+import { and, asc, between, eq, gte, isNull, sql, type SQL } from "drizzle-orm";
 import { db } from "./client";
 import {
-  expenseLineValues,
   expenseLines,
   monthlyEntries,
   type ExpenseLine,
   type MonthlyEntry,
 } from "./schema";
-import { addMonths, type YearMonth } from "@/lib/dates";
+import { addMonths, ymInt, type YearMonth } from "@/lib/dates";
+
+/** Condição "lançamento ainda não pago": paid_at e actual_cents nulos. */
+export function unpaidEntry(): SQL {
+  return and(
+    isNull(monthlyEntries.paidAt),
+    isNull(monthlyEntries.actualCents),
+  )!;
+}
 
 export async function listExpenseLines(opts?: {
   includeArchived?: boolean;
@@ -24,11 +31,6 @@ export async function listExpenseLines(opts?: {
       asc(expenseLines.displayOrder),
       asc(expenseLines.id),
     );
-}
-
-/** Comparador numérico (yyyymm) entre dois year/month. */
-function ymInt({ year, month }: YearMonth): number {
-  return year * 100 + month;
 }
 
 export async function listMonthlyEntries(
@@ -122,7 +124,7 @@ export async function applyDueDayFromMonth(input: {
   dueDay: number;
   oldLineDueDay: number;
 }): Promise<void> {
-  const targetInt = input.year * 100 + input.month;
+  const targetInt = ymInt({ year: input.year, month: input.month });
   // 1) Snapshot do histórico: meses < target sem override herdavam a linha → cristaliza com o dueDay antigo.
   await db
     .update(monthlyEntries)
@@ -163,19 +165,7 @@ export async function applyValueFromMonth(input: {
   projectedCents: number;
 }): Promise<void> {
   const { lineId, year, month, projectedCents } = input;
-  await db
-    .insert(expenseLineValues)
-    .values({ lineId, effectiveYear: year, effectiveMonth: month, projectedCents })
-    .onConflictDoUpdate({
-      target: [
-        expenseLineValues.lineId,
-        expenseLineValues.effectiveYear,
-        expenseLineValues.effectiveMonth,
-      ],
-      set: { projectedCents },
-    });
-
-  const targetInt = year * 100 + month;
+  const targetInt = ymInt({ year, month });
   await db
     .update(monthlyEntries)
     .set({ projectedCents, updatedAt: new Date() })
@@ -186,8 +176,7 @@ export async function applyValueFromMonth(input: {
           sql<number>`${monthlyEntries.year} * 100 + ${monthlyEntries.month}`,
           targetInt,
         ),
-        isNull(monthlyEntries.paidAt),
-        isNull(monthlyEntries.actualCents),
+        unpaidEntry(),
       ),
     );
 }

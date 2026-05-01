@@ -1,6 +1,6 @@
 import { AlertCircle, BellRing, CreditCard, Plus } from "lucide-react";
 import { formatBRL } from "@/lib/money";
-import { monthLabelLong, todayInAppTz } from "@/lib/dates";
+import { clampDueDay, monthLabelLong, todayInAppTz } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { ExpenseRow } from "./expense-row";
 import { AddExpenseButton } from "@/app/(app)/despesas/add-expense-button";
@@ -87,7 +87,7 @@ export function MonthView({ lines, entries, year, month }: Props) {
       if (entry?.paidAt) return null;
       if (isCardLine(line, entry)) return null;
       const effectiveDueDay = entry?.dueDay ?? line.dueDay;
-      const dueDay = Math.min(effectiveDueDay, 28);
+      const dueDay = clampDueDay(effectiveDueDay, year, month);
       const dueDate = new Date(year, month - 1, dueDay);
       const dueKey = year * 10000 + month * 100 + dueDay;
       const daysUntil = Math.round(

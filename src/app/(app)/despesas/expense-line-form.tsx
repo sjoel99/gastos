@@ -281,7 +281,7 @@ export function ExpenseLineForm({
             {recurrence === "single"
               ? "Lançamento único — só aparece neste mês."
               : recurrence === "ongoing"
-                ? "Lançamentos previstos para os próximos 60 meses (você ajusta valores conforme paga)."
+                ? `Lançamentos previstos para os próximos ${ONGOING_DEFAULT} meses (você ajusta valores conforme paga).`
                 : `Cria ${monthsCount} lançamentos previstos a partir do mês escolhido.`}
           </p>
         </>

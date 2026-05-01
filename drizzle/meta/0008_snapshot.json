@@ -1,6 +1,6 @@
 {
-  "id": "955aec7a-70b3-4925-8a66-3d7ae30f5871",
-  "prevId": "3ba95752-3d0a-41a6-8e71-53f2b00603f6",
+  "id": "97f17fe8-5066-4b64-a7c0-f990459a7365",
+  "prevId": "955aec7a-70b3-4925-8a66-3d7ae30f5871",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -161,98 +161,6 @@
           ]
         }
       },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.expense_line_value": {
-      "name": "expense_line_value",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "line_id": {
-          "name": "line_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "effective_year": {
-          "name": "effective_year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "effective_month": {
-          "name": "effective_month",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "projected_cents": {
-          "name": "projected_cents",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "expense_line_value_line_year_month_idx": {
-          "name": "expense_line_value_line_year_month_idx",
-          "columns": [
-            {
-              "expression": "line_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "effective_year",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "effective_month",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "expense_line_value_line_id_expense_line_id_fk": {
-          "name": "expense_line_value_line_id_expense_line_id_fk",
-          "tableFrom": "expense_line_value",
-          "tableTo": "expense_line",
-          "columnsFrom": [
-            "line_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

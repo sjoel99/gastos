@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { CellEditor } from "@/components/cell-editor";
 import { ConfirmPaymentDialog } from "@/components/confirm-payment-dialog";
+import { clampDueDay, todayInAppTz } from "@/lib/dates";
 import { expenseIcon } from "@/lib/expense-icons";
 import { formatBRL } from "@/lib/money";
 import { togglePaidAction } from "./actions";
@@ -31,16 +32,10 @@ export function ExpenseRow({ line, entry, year, month }: Props) {
   const effectiveDueDay = entry?.dueDay ?? line.dueDay;
   const { Icon, bg, fg } = expenseIcon(line);
 
-  const today = new Date();
-  const dueDate = new Date(year, month - 1, Math.min(effectiveDueDay, 28));
-  const dueKey =
-    dueDate.getFullYear() * 10000 +
-    (dueDate.getMonth() + 1) * 100 +
-    dueDate.getDate();
-  const todayKey =
-    today.getFullYear() * 10000 +
-    (today.getMonth() + 1) * 100 +
-    today.getDate();
+  const today = todayInAppTz();
+  const dueDay = clampDueDay(effectiveDueDay, year, month);
+  const dueKey = year * 10000 + month * 100 + dueDay;
+  const todayKey = today.year * 10000 + today.month * 100 + today.day;
   const isDueToday = !isPaid && !isCard && dueKey === todayKey;
   const isOverdue = !isPaid && !isCard && dueKey < todayKey;
 

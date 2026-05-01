@@ -105,28 +105,6 @@ export const pushSubscriptions = pgTable("push_subscription", {
     .defaultNow(),
 });
 
-export const expenseLineValues = pgTable(
-  "expense_line_value",
-  {
-    id: serial("id").primaryKey(),
-    lineId: integer("line_id")
-      .notNull()
-      .references(() => expenseLines.id, { onDelete: "cascade" }),
-    effectiveYear: integer("effective_year").notNull(),
-    effectiveMonth: smallint("effective_month").notNull(),
-    projectedCents: integer("projected_cents").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (t) => [
-    uniqueIndex("expense_line_value_line_year_month_idx").on(
-      t.lineId,
-      t.effectiveYear,
-      t.effectiveMonth,
-    ),
-  ],
-);
 
 export const monthlyEntries = pgTable(
   "monthly_entry",

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, eq, gte, isNull, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db/client";
@@ -10,14 +10,12 @@ import {
   applyDueDayFromMonth,
   applyValueFromMonth,
   getMonthlyEntry,
+  unpaidEntry,
   upsertMonthlyEntry,
 } from "@/db/queries";
+import { ymInt } from "@/lib/dates";
 import { parseBRLToCents } from "@/lib/money";
-
-const boolField = z
-  .string()
-  .optional()
-  .transform((v) => v === "on" || v === "true");
+import { boolField } from "@/lib/schemas";
 
 const upsertSchema = z.object({
   lineId: z.coerce.number().int().positive(),
@@ -224,9 +222,7 @@ export async function deleteEntriesFromMonthAction(
   if (!parsed.success) return { error: "Dados inválidos." };
 
   const { lineId, year, month } = parsed.data;
-  const targetInt = year * 100 + month;
-  // Preserva meses já pagos (paidAt OU actualCents preenchidos), seguindo a
-  // mesma convenção de applyValueFromMonth.
+  const targetInt = ymInt({ year, month });
   await db
     .delete(monthlyEntries)
     .where(
@@ -236,8 +232,7 @@ export async function deleteEntriesFromMonthAction(
           sql<number>`${monthlyEntries.year} * 100 + ${monthlyEntries.month}`,
           targetInt,
         ),
-        isNull(monthlyEntries.paidAt),
-        isNull(monthlyEntries.actualCents),
+        unpaidEntry(),
       ),
     );
 

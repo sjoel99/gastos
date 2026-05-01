@@ -57,6 +57,13 @@
       "when": 1777945200000,
       "tag": "0007_categorize_expense_lines",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1777945200001,
+      "tag": "0008_flashy_mystique",
+      "breakpoints": true
     }
   ]
 }

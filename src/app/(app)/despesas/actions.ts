@@ -8,6 +8,7 @@ import { db } from "@/db/client";
 import { expenseLines, monthlyEntries } from "@/db/schema";
 import { parseBRLToCents } from "@/lib/money";
 import { addMonths } from "@/lib/dates";
+import { boolField } from "@/lib/schemas";
 
 async function requireAuth() {
   const session = await auth();
@@ -25,10 +26,7 @@ const baseSchema = z.object({
   defaultProjected: z.string().optional(),
   dueDay: z.coerce.number().int().min(1).max(31),
   displayOrder: z.coerce.number().int().min(0).default(0),
-  defaultPaidWithCard: z
-    .string()
-    .optional()
-    .transform((v) => v === "on" || v === "true"),
+  defaultPaidWithCard: boolField,
 });
 
 const createSchema = baseSchema.extend({
@@ -132,7 +130,7 @@ export async function setArchivedAction(
 
 export async function deleteLineAction(id: number): Promise<void> {
   await requireAuth();
-  // FK on monthlyEntries / expenseLineValues → cascade.
+  // FK on monthly_entry → cascade.
   await db.delete(expenseLines).where(eq(expenseLines.id, id));
   revalidatePath("/despesas");
   revalidatePath("/matriz");

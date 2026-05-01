@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { categoryColor } from "@/lib/categories";
 import { formatBRL } from "@/lib/money";
-import { monthLabelLong } from "@/lib/dates";
+import { monthLabelLong, todayInAppTz } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { ExpenseRow } from "./expense-row";
 import type { ExpenseLine, MonthlyEntry } from "@/db/schema";
@@ -75,11 +75,9 @@ export function CalendarView({ lines, entries, year, month }: Props) {
     return { total, cardTotal };
   };
 
-  const today = new Date();
+  const today = todayInAppTz();
   const isToday = (day: number) =>
-    today.getFullYear() === year &&
-    today.getMonth() + 1 === month &&
-    today.getDate() === day;
+    today.year === year && today.month === month && today.day === day;
 
   const linesForOpen = openDay ? (linesByDay.get(openDay) ?? []) : [];
 

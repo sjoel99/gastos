@@ -79,6 +79,21 @@ export function ymKey({ year, month }: YearMonth): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
+/** Comparador numérico (yyyymm). Útil pra ordenar/comparar year+month. */
+export function ymInt({ year, month }: YearMonth): number {
+  return year * 100 + month;
+}
+
+/** Último dia do mês (28-31). */
+export function lastDayOfMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+/** Clampa o dia de vencimento ao último dia do mês informado. */
+export function clampDueDay(dueDay: number, year: number, month: number): number {
+  return Math.min(dueDay, lastDayOfMonth(year, month));
+}
+
 /** Status visual de um lançamento. */
 export type EntryStatus = "paid" | "pending" | "overdue" | "empty";
 
@@ -96,7 +111,7 @@ export function entryStatus(opts: {
   if (projectedCents === 0 && actualCents === null) return "empty";
   const t = todayInAppTz(opts.today ?? new Date());
   const todayKey = t.year * 10000 + t.month * 100 + t.day;
-  const dueKey = year * 10000 + month * 100 + Math.min(dueDay, 28);
+  const dueKey = year * 10000 + month * 100 + clampDueDay(dueDay, year, month);
   if (todayKey > dueKey) return "overdue";
   return "pending";
 }

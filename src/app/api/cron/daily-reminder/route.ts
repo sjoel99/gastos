@@ -10,7 +10,7 @@ import {
 } from "@/db/schema";
 import { env } from "@/env";
 import { getAllowedEmailSet } from "@/lib/allowed-emails";
-import { todayInAppTz } from "@/lib/dates";
+import { clampDueDay, todayInAppTz } from "@/lib/dates";
 import { formatBRL } from "@/lib/money";
 import { isPushConfigured, sendPush } from "@/lib/push";
 
@@ -45,9 +45,8 @@ async function findDueToday(): Promise<DueItem[]> {
     );
 
   // Filtra pelo dia (clamp se o mês não tem o dia exato)
-  const lastDay = new Date(year, month, 0).getDate();
   return rows
-    .filter((r) => Math.min(r.dueDay, lastDay) === day)
+    .filter((r) => clampDueDay(r.dueDay, year, month) === day)
     .map((r) => ({
       name: r.name,
       valueCents: r.actualCents ?? r.projectedCents ?? 0,
