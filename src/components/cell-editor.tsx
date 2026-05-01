@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { CalendarRange, CreditCard, Loader2 } from "lucide-react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { CalendarRange, CreditCard, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { saveEntryAction, type EntryFormState } from "@/app/(app)/matriz/actions";
+import {
+  deleteEntriesFromMonthAction,
+  deleteEntryAction,
+  saveEntryAction,
+  type EntryFormState,
+} from "@/app/(app)/matriz/actions";
 import { centsToInputString, formatBRL, parseBRLToCents } from "@/lib/money";
 import { monthLabelLong } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -69,6 +74,8 @@ function CellEditorForm({
   const [confirmDueDayForward, setConfirmDueDayForward] = useState<{
     day: number;
   } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, startDelete] = useTransition();
 
   useEffect(() => {
     if (state?.ok) {
@@ -105,6 +112,31 @@ function CellEditorForm({
       applyDueDayForwardRef.current.value = "true";
     setConfirmDueDayForward(null);
     formRef.current?.requestSubmit();
+  };
+
+  const runDelete = (scope: "single" | "forward") => {
+    if (!entry) return;
+    startDelete(async () => {
+      const fd = new FormData();
+      fd.set("lineId", String(line.id));
+      fd.set("year", String(year));
+      fd.set("month", String(month));
+      const result =
+        scope === "single"
+          ? await deleteEntryAction(undefined, fd)
+          : await deleteEntriesFromMonthAction(undefined, fd);
+      if (result?.ok) {
+        toast.success(
+          scope === "single"
+            ? "Lançamento excluído"
+            : "Lançamentos excluídos a partir deste mês",
+        );
+        setConfirmDelete(false);
+        onSaved();
+      } else {
+        toast.error(result?.error ?? "Falha ao excluir.");
+      }
+    });
   };
 
   return (
@@ -210,7 +242,7 @@ function CellEditorForm({
           />
         </div>
 
-        <SheetFooter className="mt-auto">
+        <SheetFooter className="mt-auto gap-2">
           <Button type="submit" disabled={pending} className="w-full h-11">
             {pending ? (
               <>
@@ -220,6 +252,18 @@ function CellEditorForm({
               "Salvar"
             )}
           </Button>
+          {entry ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setConfirmDelete(true)}
+              disabled={deletePending}
+              className="w-full h-11 text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-4" />
+              Excluir lançamento
+            </Button>
+          ) : null}
         </SheetFooter>
       </form>
 
@@ -251,6 +295,63 @@ function CellEditorForm({
             </Button>
             <Button onClick={submitWithForward} type="button">
               Aplicar e salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={confirmDelete}
+        onOpenChange={(o) => !o && setConfirmDelete(false)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir lançamento</DialogTitle>
+            <DialogDescription>
+              <strong>{line.name}</strong> em{" "}
+              <strong>{monthLabelLong(year, month)}</strong>. Escolha o alcance
+              da exclusão. Meses já pagos não são afetados.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:flex-col sm:items-stretch sm:space-x-0 gap-2">
+            <Button
+              variant="destructive"
+              onClick={() => runDelete("single")}
+              disabled={deletePending}
+              type="button"
+              className="h-11"
+            >
+              {deletePending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Excluindo...
+                </>
+              ) : (
+                "Excluir só este mês"
+              )}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => runDelete("forward")}
+              disabled={deletePending}
+              type="button"
+              className="h-11"
+            >
+              {deletePending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Excluindo...
+                </>
+              ) : (
+                "Excluir este e os próximos"
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmDelete(false)}
+              type="button"
+              disabled={deletePending}
+              className="h-11"
+            >
+              Cancelar
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import { env } from "@/env";
 import { getAllowedEmailSet } from "@/lib/allowed-emails";
+import { todayInAppTz } from "@/lib/dates";
 import { formatBRL } from "@/lib/money";
 import { isPushConfigured, sendPush } from "@/lib/push";
 
@@ -21,10 +22,7 @@ type DueItem = {
 };
 
 async function findDueToday(): Promise<DueItem[]> {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
+  const { year, month, day } = todayInAppTz();
 
   // Busca entries do mês corrente, não pagas, não cartão, com despesa ativa
   const rows = await db

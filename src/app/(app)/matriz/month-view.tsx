@@ -1,6 +1,6 @@
 import { AlertCircle, BellRing, CreditCard, Plus } from "lucide-react";
 import { formatBRL } from "@/lib/money";
-import { monthLabelLong } from "@/lib/dates";
+import { monthLabelLong, todayInAppTz } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { ExpenseRow } from "./expense-row";
 import { AddExpenseButton } from "@/app/(app)/despesas/add-expense-button";
@@ -37,11 +37,12 @@ function dueLabel(daysUntil: number): string {
 }
 
 function lineActiveInMonth(
-  line: ExpenseLine,
+  _line: ExpenseLine,
   entry: MonthlyEntry | undefined,
 ): boolean {
-  // Aparece se tem lançamento (qualquer entry persistida) ou valor padrão > 0.
-  return !!entry || line.defaultProjectedCents > 0;
+  // Aparece só onde existe lançamento persistido — o range de criação
+  // (Único / Mensal / X meses) define em quais meses a linha entra.
+  return !!entry;
 }
 
 export function MonthView({ lines, entries, year, month }: Props) {
@@ -76,24 +77,21 @@ export function MonthView({ lines, entries, year, month }: Props) {
     denom > 0 ? Math.round(((paidPositive + paidCard) / denom) * 100) : 0;
   const isFullyPaid = pctPaid === 100;
 
-  const today = new Date();
-  const todayKey =
-    today.getFullYear() * 10000 +
-    (today.getMonth() + 1) * 100 +
-    today.getDate();
+  const today = todayInAppTz();
+  const todayKey = today.year * 10000 + today.month * 100 + today.day;
+  // Date local p/ diff em dias (independe de fuso pois usamos só o componente data).
+  const todayDate = new Date(today.year, today.month - 1, today.day);
   const upcomingAll = visibleLines
     .map((line) => {
       const entry = entryByLine.get(line.id);
       if (entry?.paidAt) return null;
       if (isCardLine(line, entry)) return null;
       const effectiveDueDay = entry?.dueDay ?? line.dueDay;
-      const dueDate = new Date(year, month - 1, Math.min(effectiveDueDay, 28));
-      const dueKey =
-        dueDate.getFullYear() * 10000 +
-        (dueDate.getMonth() + 1) * 100 +
-        dueDate.getDate();
-      const daysUntil = Math.ceil(
-        (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+      const dueDay = Math.min(effectiveDueDay, 28);
+      const dueDate = new Date(year, month - 1, dueDay);
+      const dueKey = year * 10000 + month * 100 + dueDay;
+      const daysUntil = Math.round(
+        (dueDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24),
       );
       const isToday = dueKey === todayKey;
       if (!isToday && (daysUntil < 0 || daysUntil > 7)) return null;

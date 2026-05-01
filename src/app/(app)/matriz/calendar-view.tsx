@@ -52,8 +52,8 @@ export function CalendarView({ lines, entries, year, month }: Props) {
     const map = new Map<number, ExpenseLine[]>();
     for (const line of lines) {
       const entry = entryByLine.get(line.id);
-      // Só conta a despesa no mês se tem lançamento ou valor padrão > 0.
-      if (!entry && line.defaultProjectedCents <= 0) continue;
+      // Só conta a despesa no mês se tem lançamento real (range definido na criação).
+      if (!entry) continue;
       const effectiveDueDay = entry?.dueDay ?? line.dueDay;
       const day = Math.min(effectiveDueDay, daysInMonth);
       if (!map.has(day)) map.set(day, []);

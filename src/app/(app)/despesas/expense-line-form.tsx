@@ -1,11 +1,26 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { CreditCard, Infinity as InfinityIcon } from "lucide-react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import {
+  Calendar,
+  CreditCard,
+  Infinity as InfinityIcon,
+  Loader2,
+  Trash2,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -15,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import {
   createLineAction,
+  deleteLineAction,
   updateLineAction,
   type LineFormState,
 } from "./actions";
@@ -55,8 +71,26 @@ export function ExpenseLineForm({
 
   const [startYear, setStartYear] = useState(initialStartYear);
   const [startMonth, setStartMonth] = useState(initialStartMonth);
-  const [recurrence, setRecurrence] = useState<"ongoing" | "fixed">("ongoing");
+  const [recurrence, setRecurrence] = useState<"single" | "ongoing" | "fixed">(
+    "ongoing",
+  );
   const [monthsCount, setMonthsCount] = useState<number>(12);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, startDelete] = useTransition();
+
+  const handleDelete = () => {
+    if (!initial) return;
+    startDelete(async () => {
+      try {
+        await deleteLineAction(initial.id);
+        toast.success("Despesa excluída");
+        setConfirmDelete(false);
+        onSaved?.();
+      } catch {
+        toast.error("Falha ao excluir.");
+      }
+    });
+  };
 
   useEffect(() => {
     if (state?.ok) {
@@ -70,9 +104,15 @@ export function ExpenseLineForm({
   }, [state, mode, onSaved]);
 
   const yearOptions = Array.from({ length: 5 }, (_, i) => now.year - 1 + i);
-  const effectiveCount = recurrence === "ongoing" ? ONGOING_DEFAULT : monthsCount;
+  const effectiveCount =
+    recurrence === "single"
+      ? 1
+      : recurrence === "ongoing"
+        ? ONGOING_DEFAULT
+        : monthsCount;
 
   return (
+    <>
     <form
       ref={formRef}
       action={formAction}
@@ -134,9 +174,11 @@ export function ExpenseLineForm({
 
       {mode === "create" ? (
         <>
-          <div className="sm:col-span-2 grid grid-cols-2 gap-3">
+          <div className="sm:col-span-2 flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Começa em</Label>
+              <Label>
+                {recurrence === "single" ? "Mês do lançamento" : "Começa em"}
+              </Label>
               <div className="grid grid-cols-2 gap-2">
                 <Select
                   value={String(startMonth)}
@@ -177,12 +219,26 @@ export function ExpenseLineForm({
 
             <div className="flex flex-col gap-1.5">
               <Label>Repetições</Label>
-              <div className="flex gap-1.5 bg-muted rounded-lg p-1 h-11">
+              <div className="grid grid-cols-3 gap-1.5 bg-muted rounded-lg p-1 h-11">
+                <button
+                  type="button"
+                  onClick={() => setRecurrence("single")}
+                  className={cn(
+                    "rounded-md text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
+                    recurrence === "single"
+                      ? "bg-background shadow-sm"
+                      : "text-muted-foreground",
+                  )}
+                  aria-pressed={recurrence === "single"}
+                >
+                  <Zap className="size-3.5" />
+                  Único
+                </button>
                 <button
                   type="button"
                   onClick={() => setRecurrence("ongoing")}
                   className={cn(
-                    "flex-1 rounded-md text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
+                    "rounded-md text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
                     recurrence === "ongoing"
                       ? "bg-background shadow-sm"
                       : "text-muted-foreground",
@@ -196,13 +252,14 @@ export function ExpenseLineForm({
                   type="button"
                   onClick={() => setRecurrence("fixed")}
                   className={cn(
-                    "flex-1 rounded-md text-sm font-medium transition-colors",
+                    "rounded-md text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
                     recurrence === "fixed"
                       ? "bg-background shadow-sm"
                       : "text-muted-foreground",
                   )}
                   aria-pressed={recurrence === "fixed"}
                 >
+                  <Calendar className="size-3.5" />
                   X meses
                 </button>
               </div>
@@ -221,9 +278,11 @@ export function ExpenseLineForm({
           </div>
 
           <p className="sm:col-span-2 text-xs text-muted-foreground -mt-1">
-            {recurrence === "ongoing"
-              ? "Lançamentos previstos para os próximos 60 meses (você ajusta valores conforme paga)."
-              : `Cria ${monthsCount} lançamentos previstos a partir do mês escolhido.`}
+            {recurrence === "single"
+              ? "Lançamento único — só aparece neste mês."
+              : recurrence === "ongoing"
+                ? "Lançamentos previstos para os próximos 60 meses (você ajusta valores conforme paga)."
+                : `Cria ${monthsCount} lançamentos previstos a partir do mês escolhido.`}
           </p>
         </>
       ) : null}
@@ -248,7 +307,19 @@ export function ExpenseLineForm({
         />
       </label>
 
-      <div className="sm:col-span-2 flex justify-end gap-2 pt-1">
+      <div className="sm:col-span-2 flex flex-wrap justify-end items-center gap-2 pt-1">
+        {mode === "edit" && initial ? (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setConfirmDelete(true)}
+            disabled={deletePending}
+            className="h-11 px-4 mr-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="size-4" />
+            Excluir
+          </Button>
+        ) : null}
         {onCancel ? (
           <Button
             type="button"
@@ -264,5 +335,47 @@ export function ExpenseLineForm({
         </Button>
       </div>
     </form>
+
+    <Dialog
+      open={confirmDelete}
+      onOpenChange={(o) => !o && setConfirmDelete(false)}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Excluir esta despesa?</DialogTitle>
+          <DialogDescription>
+            <strong>{initial?.name}</strong> e <strong>todos</strong> os
+            lançamentos dela (passados e futuros) serão removidos. Essa ação
+            não pode ser desfeita. Se quiser preservar o histórico, prefira
+            arquivar.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="ghost"
+            onClick={() => setConfirmDelete(false)}
+            type="button"
+            disabled={deletePending}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deletePending}
+            type="button"
+          >
+            {deletePending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Excluindo...
+              </>
+            ) : (
+              "Excluir despesa"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

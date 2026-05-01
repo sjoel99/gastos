@@ -129,3 +129,11 @@ export async function setArchivedAction(
   revalidatePath("/despesas");
   revalidatePath("/matriz");
 }
+
+export async function deleteLineAction(id: number): Promise<void> {
+  await requireAuth();
+  // FK on monthlyEntries / expenseLineValues → cascade.
+  await db.delete(expenseLines).where(eq(expenseLines.id, id));
+  revalidatePath("/despesas");
+  revalidatePath("/matriz");
+}

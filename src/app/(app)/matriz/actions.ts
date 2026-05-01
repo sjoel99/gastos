@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { and, eq, gte, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db/client";
-import { expenseLines } from "@/db/schema";
+import { expenseLines, monthlyEntries } from "@/db/schema";
 import {
   applyDueDayFromMonth,
   applyValueFromMonth,
@@ -179,6 +179,71 @@ const toggleSchema = z.object({
   month: z.coerce.number().int().min(1).max(12),
   paid: z.string(),
 });
+
+const deleteEntrySchema = z.object({
+  lineId: z.coerce.number().int().positive(),
+  year: z.coerce.number().int().min(2000).max(2100),
+  month: z.coerce.number().int().min(1).max(12),
+});
+
+export type DeleteEntryState = { error?: string; ok?: boolean } | undefined;
+
+export async function deleteEntryAction(
+  _prev: DeleteEntryState,
+  formData: FormData,
+): Promise<DeleteEntryState> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Não autenticado." };
+
+  const parsed = deleteEntrySchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: "Dados inválidos." };
+
+  const { lineId, year, month } = parsed.data;
+  await db
+    .delete(monthlyEntries)
+    .where(
+      and(
+        eq(monthlyEntries.lineId, lineId),
+        eq(monthlyEntries.year, year),
+        eq(monthlyEntries.month, month),
+      ),
+    );
+
+  revalidatePath("/matriz");
+  return { ok: true };
+}
+
+export async function deleteEntriesFromMonthAction(
+  _prev: DeleteEntryState,
+  formData: FormData,
+): Promise<DeleteEntryState> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Não autenticado." };
+
+  const parsed = deleteEntrySchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: "Dados inválidos." };
+
+  const { lineId, year, month } = parsed.data;
+  const targetInt = year * 100 + month;
+  // Preserva meses já pagos (paidAt OU actualCents preenchidos), seguindo a
+  // mesma convenção de applyValueFromMonth.
+  await db
+    .delete(monthlyEntries)
+    .where(
+      and(
+        eq(monthlyEntries.lineId, lineId),
+        gte(
+          sql<number>`${monthlyEntries.year} * 100 + ${monthlyEntries.month}`,
+          targetInt,
+        ),
+        isNull(monthlyEntries.paidAt),
+        isNull(monthlyEntries.actualCents),
+      ),
+    );
+
+  revalidatePath("/matriz");
+  return { ok: true };
+}
 
 export async function togglePaidAction(formData: FormData): Promise<void> {
   const session = await auth();

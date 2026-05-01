@@ -38,9 +38,31 @@ export function monthLabelLong(year: number, month: number): string {
 
 export type YearMonth = { year: number; month: number };
 
+export const APP_TZ = "America/Sao_Paulo";
+
+const ymdFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: APP_TZ,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** Retorna {year, month, day} no fuso do app (independe da TZ do processo). */
+export function todayInAppTz(now: Date = new Date()): {
+  year: number;
+  month: number;
+  day: number;
+} {
+  const parts = ymdFormatter.formatToParts(now);
+  const year = Number(parts.find((p) => p.type === "year")!.value);
+  const month = Number(parts.find((p) => p.type === "month")!.value);
+  const day = Number(parts.find((p) => p.type === "day")!.value);
+  return { year, month, day };
+}
+
 export function currentYearMonth(): YearMonth {
-  const d = new Date();
-  return { year: d.getFullYear(), month: d.getMonth() + 1 };
+  const { year, month } = todayInAppTz();
+  return { year, month };
 }
 
 export function addMonths({ year, month }: YearMonth, delta: number): YearMonth {
@@ -72,8 +94,9 @@ export function entryStatus(opts: {
   const { projectedCents, actualCents, paidAt, dueDay, year, month } = opts;
   if (paidAt || actualCents !== null) return "paid";
   if (projectedCents === 0 && actualCents === null) return "empty";
-  const today = opts.today ?? new Date();
-  const due = new Date(year, month - 1, Math.min(dueDay, 28));
-  if (today > due) return "overdue";
+  const t = todayInAppTz(opts.today ?? new Date());
+  const todayKey = t.year * 10000 + t.month * 100 + t.day;
+  const dueKey = year * 10000 + month * 100 + Math.min(dueDay, 28);
+  if (todayKey > dueKey) return "overdue";
   return "pending";
 }
