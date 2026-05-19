@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7
 FROM node:22-alpine AS base
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 
 # ---- deps ----
