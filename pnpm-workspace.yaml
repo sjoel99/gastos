@@ -2,3 +2,8 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - unrs-resolver
+
+# msw vem como dep transitiva do CLI `shadcn` mas não é usada em runtime —
+# silencia o aviso de build ignorado pra não falhar `pnpm install` em pnpm strict.
+ignoredBuiltDependencies:
+  - msw
