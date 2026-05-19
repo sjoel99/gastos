@@ -31,25 +31,15 @@ function isCardLine(
 }
 
 function dueLabel(daysUntil: number): string {
-  if (daysUntil <= 0) return "Hoje";
   if (daysUntil === 1) return "Amanhã";
   return `${daysUntil}d`;
 }
 
-function lineActiveInMonth(
-  _line: ExpenseLine,
-  entry: MonthlyEntry | undefined,
-): boolean {
-  // Aparece só onde existe lançamento persistido — o range de criação
-  // (Único / Mensal / X meses) define em quais meses a linha entra.
-  return !!entry;
-}
-
 export function MonthView({ lines, entries, year, month }: Props) {
   const entryByLine = new Map(entries.map((e) => [e.lineId, e]));
-  const visibleLines = lines.filter((l) =>
-    lineActiveInMonth(l, entryByLine.get(l.id)),
-  );
+  // Despesa aparece só onde existe lançamento persistido — o range de criação
+  // (Único / Mensal / X meses) define em quais meses a linha entra.
+  const visibleLines = lines.filter((l) => entryByLine.has(l.id));
 
   // Cartão fica fora dos totais do mês — já está dentro de outra fatura.
   // cardTotal é só subtotal informativo no header.
@@ -70,36 +60,27 @@ export function MonthView({ lines, entries, year, month }: Props) {
   const pctPaid = total > 0 ? Math.round((paidTotal / total) * 100) : 0;
   const isFullyPaid = pctPaid === 100;
 
-  const today = todayInAppTz();
-  const todayKey = today.year * 10000 + today.month * 100 + today.day;
   // Date local p/ diff em dias (independe de fuso pois usamos só o componente data).
+  const today = todayInAppTz();
   const todayDate = new Date(today.year, today.month - 1, today.day);
-  const upcomingAll = visibleLines
-    .map((line) => {
-      const entry = entryByLine.get(line.id);
-      if (entry?.paidAt) return null;
-      if (isCardLine(line, entry)) return null;
-      const effectiveDueDay = entry?.dueDay ?? line.dueDay;
-      const dueDay = clampDueDay(effectiveDueDay, year, month);
-      const dueDate = new Date(year, month - 1, dueDay);
-      const dueKey = year * 10000 + month * 100 + dueDay;
-      const daysUntil = Math.round(
-        (dueDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
-      const isToday = dueKey === todayKey;
-      if (!isToday && (daysUntil < 0 || daysUntil > 7)) return null;
-      return {
-        line,
-        daysUntil,
-        isToday,
-        value: entryValueCents(line, entry),
-      };
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null)
-    .sort((a, b) => a.daysUntil - b.daysUntil);
 
-  const dueToday = upcomingAll.filter((x) => x.isToday);
-  const upcoming = upcomingAll.filter((x) => !x.isToday);
+  type UpcomingItem = { line: ExpenseLine; daysUntil: number; value: number };
+  const dueToday: UpcomingItem[] = [];
+  const upcoming: UpcomingItem[] = [];
+  for (const line of visibleLines) {
+    const entry = entryByLine.get(line.id);
+    if (entry?.paidAt) continue;
+    if (isCardLine(line, entry)) continue;
+    const dueDay = clampDueDay(entry?.dueDay ?? line.dueDay, year, month);
+    const dueDate = new Date(year, month - 1, dueDay);
+    const daysUntil = Math.round(
+      (dueDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    const item = { line, daysUntil, value: entryValueCents(line, entry) };
+    if (daysUntil === 0) dueToday.push(item);
+    else if (daysUntil >= 1 && daysUntil <= 7) upcoming.push(item);
+  }
+  upcoming.sort((a, b) => a.daysUntil - b.daysUntil);
   const dueTodayTotal = dueToday.reduce((s, x) => s + x.value, 0);
 
   if (visibleLines.length === 0) {
@@ -256,14 +237,7 @@ export function MonthView({ lines, entries, year, month }: Props) {
                 className="flex items-center justify-between gap-2 text-sm"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span
-                    className={cn(
-                      "px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums shrink-0",
-                      daysUntil <= 0
-                        ? "bg-rose-600 text-white"
-                        : "bg-amber-200/70 text-amber-900 dark:bg-amber-900/60 dark:text-amber-100",
-                    )}
-                  >
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums shrink-0 bg-amber-200/70 text-amber-900 dark:bg-amber-900/60 dark:text-amber-100">
                     {dueLabel(daysUntil)}
                   </span>
                   <span className="truncate text-amber-950 dark:text-amber-100">
