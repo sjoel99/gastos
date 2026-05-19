@@ -51,30 +51,23 @@ export function MonthView({ lines, entries, year, month }: Props) {
     lineActiveInMonth(l, entryByLine.get(l.id)),
   );
 
-  let positiveTotal = 0;
+  // Cartão fica fora dos totais do mês — já está dentro de outra fatura.
+  // cardTotal é só subtotal informativo no header.
+  let total = 0;
+  let paidTotal = 0;
   let cardTotal = 0;
-  let paidPositive = 0;
-  let paidCard = 0;
   for (const line of visibleLines) {
     const entry = entryByLine.get(line.id);
     const value = entryValueCents(line, entry);
-    const paid = !!entry?.paidAt;
     if (isCardLine(line, entry)) {
       cardTotal += value;
-      if (paid) paidCard += value;
       continue;
     }
-    positiveTotal += value;
-    if (paid) paidPositive += value;
+    total += value;
+    if (entry?.paidAt) paidTotal += value;
   }
-  // "Pago cartão" abate do total do mês (já está dentro de outra fatura).
-  const total = positiveTotal - cardTotal;
-  const paidTotal = paidPositive - paidCard;
-  const pendingTotal =
-    positiveTotal - paidPositive - (cardTotal - paidCard);
-  const denom = positiveTotal + cardTotal;
-  const pctPaid =
-    denom > 0 ? Math.round(((paidPositive + paidCard) / denom) * 100) : 0;
+  const pendingTotal = total - paidTotal;
+  const pctPaid = total > 0 ? Math.round((paidTotal / total) * 100) : 0;
   const isFullyPaid = pctPaid === 100;
 
   const today = todayInAppTz();
@@ -152,11 +145,11 @@ export function MonthView({ lines, entries, year, month }: Props) {
               {cardTotal > 0 ? (
                 <div
                   className="flex items-center gap-1.5 text-[11px] bg-white/15 px-2.5 py-1 rounded-full backdrop-blur-sm shrink-0"
-                  title="Pago no cartão — abate do total do mês"
+                  title="Pago no cartão — fora do total do mês (já está na fatura)"
                 >
                   <CreditCard className="size-3" />
                   <span className="tabular-nums font-semibold">
-                    −{formatBRL(cardTotal)}
+                    {formatBRL(cardTotal)}
                   </span>
                 </div>
               ) : null}
