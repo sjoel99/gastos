@@ -1,0 +1,8 @@
+{
+  "id": "2026-05-inflacao-pessoal",
+  "title": "Novidade: Inflação Pessoal",
+  "message": "Agora o ContaLeve calcula a SUA inflação real a partir dos seus gastos e compara com o IPCA oficial do IBGE. Veja na aba Análise → Saúde (Premium).",
+  "actionLabel": null,
+  "actionUrl": null,
+  "minVersionCode": null
+}
