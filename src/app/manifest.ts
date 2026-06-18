@@ -2,11 +2,11 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Gastos",
-    short_name: "Gastos",
-    description: "Controle de gastos mensais da família",
-    start_url: "/matriz",
-    display: "standalone",
+    name: "ContaLeve",
+    short_name: "ContaLeve",
+    description: "Suas contas, sem peso. Controle financeiro da família.",
+    start_url: "/",
+    display: "browser",
     background_color: "#fbfaff",
     theme_color: "#5d2ca8",
     lang: "pt-BR",

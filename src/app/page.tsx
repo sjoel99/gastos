@@ -1,7 +1,216 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  CalendarDays,
+  ChartColumnBig,
+  HeartPulse,
+  ShieldCheck,
+  TrendingUp,
+  Users,
+  WifiOff,
+} from "lucide-react";
+import { PhoneMockup } from "@/components/landing/phone-mockup";
+import { StoreBadges } from "@/components/landing/store-badges";
 
-export default async function Home() {
-  const session = await auth();
-  redirect(session ? "/matriz" : "/sign-in");
+export const metadata: Metadata = {
+  title: "ContaLeve — Suas contas, sem peso",
+  description:
+    "App de controle financeiro da família: despesas, receitas e saldo. Local-first, funciona offline e de graça, sem login. Para Android e iPhone.",
+  openGraph: {
+    title: "ContaLeve — Suas contas, sem peso",
+    description:
+      "Controle financeiro da família, local-first e sem peso. Android e iPhone.",
+    url: "https://contaleve.sjoel99.com",
+    siteName: "ContaLeve",
+    locale: "pt_BR",
+    type: "website",
+  },
+};
+
+const features = [
+  {
+    icon: CalendarDays,
+    title: "Mês a mês, sem esforço",
+    text: "Veja o total, o que já foi pago e o que falta. Despesas recorrentes se repetem sozinhas — você só confirma.",
+  },
+  {
+    icon: ChartColumnBig,
+    title: "Visão anual",
+    text: "Gráfico de barras com pago, pendente e cartão; receitas e saldo do ano em um relance.",
+  },
+  {
+    icon: HeartPulse,
+    title: "Saúde financeira",
+    text: "Um score de 0 a 100 sobre poupança, comprometimento da renda e consistência dos últimos meses.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Inflação Pessoal",
+    text: "Sua inflação real, ponderando o IPCA pelos seus próprios gastos — não a média do país.",
+  },
+  {
+    icon: WifiOff,
+    title: "Funciona offline",
+    text: "Os dados vivem no seu aparelho. O app abre direto, sem login e sem internet. De graça.",
+  },
+  {
+    icon: Users,
+    title: "Compartilhe com a família",
+    text: "Um código de convite junta dois aparelhos no mesmo espaço — Android e iPhone, no mesmo orçamento.",
+  },
+];
+
+export default function Home() {
+  return (
+    <main className="flex flex-col">
+      {/* Nav */}
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <Logo className="size-7" />
+            <span className="text-lg">ContaLeve</span>
+          </Link>
+          <nav className="flex items-center gap-6 text-sm text-muted-foreground">
+            <a href="#recursos" className="hidden hover:text-foreground sm:block">
+              Recursos
+            </a>
+            <a href="#baixar" className="hover:text-foreground">
+              Baixar
+            </a>
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacidade
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,var(--primary-soft),transparent)]" />
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-primary" />
+              Sem coleta de dados · 100% local
+            </span>
+            <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
+              Suas contas,
+              <br />
+              <span className="text-primary">sem peso.</span>
+            </h1>
+            <p className="mt-5 max-w-md text-pretty text-lg text-muted-foreground">
+              O controle financeiro da família — despesas, receitas e saldo — num
+              app que abre direto, funciona offline e é de graça.
+            </p>
+            <div className="mt-8" id="baixar">
+              <StoreBadges />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Grátis no Android e iPhone. Backup e sync na nuvem com o ContaLeve
+              Premium.
+            </p>
+          </div>
+          <div className="flex justify-center md:justify-end">
+            <PhoneMockup />
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="recursos" className="border-t border-border/60 bg-card/40">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+            Tudo o que a planilha fazia — e o que ela nunca fez
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
+            Pensado para o orçamento de casa: simples no dia a dia, esperto quando
+            você precisa entender para onde vai o dinheiro.
+          </p>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map(({ icon: Icon, title, text }) => (
+              <div
+                key={title}
+                className="rounded-2xl border border-border bg-background p-6 transition-shadow hover:shadow-sm"
+              >
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                  <Icon className="size-5" />
+                </div>
+                <h3 className="mt-4 font-semibold">{title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Privacy emphasis */}
+      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+        <div className="rounded-3xl border border-border bg-gradient-to-br from-primary/10 to-transparent p-8 md:p-12">
+          <ShieldCheck className="size-9 text-primary" />
+          <h2 className="mt-4 max-w-2xl text-2xl font-bold tracking-tight md:text-3xl">
+            Seus dados são seus. Ponto.
+          </h2>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            O ContaLeve guarda tudo no seu próprio aparelho. Não há login
+            obrigatório, não há rastreamento e nada é enviado para servidores no
+            modo grátis. Se quiser backup e compartilhamento entre aparelhos, o
+            ContaLeve Premium sincroniza com a nuvem — e só então, com o seu aval.
+          </p>
+          <Link
+            href="/privacy"
+            className="mt-6 inline-block text-sm font-medium text-primary hover:underline"
+          >
+            Ler a política de privacidade →
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border/60">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
+          <div className="flex items-center gap-2">
+            <Logo className="size-5" />
+            <span>ContaLeve · {new Date().getFullYear()}</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacidade
+            </Link>
+            <a href="mailto:sjoel99@gmail.com" className="hover:text-foreground">
+              Contato
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
+
+function Logo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden>
+      <defs>
+        <linearGradient id="cl-logo" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="oklch(0.55 0.22 305)" />
+          <stop offset="1" stopColor="oklch(0.42 0.21 305)" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="8" fill="url(#cl-logo)" />
+      <path
+        d="M11 19.5a5 5 0 1 0 0-7"
+        stroke="white"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M10 21.5q6 4 12 0"
+        stroke="white"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.85"
+      />
+    </svg>
+  );
 }

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,12 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gastos",
-  description: "Controle de gastos mensais",
+  metadataBase: new URL("https://contaleve.sjoel99.com"),
+  title: "ContaLeve — Suas contas, sem peso",
+  description:
+    "App de controle financeiro da família — despesas, receitas e saldo. Local-first, offline e de graça. Android e iPhone.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "Gastos",
+    title: "ContaLeve",
     statusBarStyle: "default",
   },
 };
@@ -43,7 +44,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
-        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

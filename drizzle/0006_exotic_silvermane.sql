@@ -1,1 +1,0 @@
-ALTER TABLE "monthly_entry" ADD COLUMN "due_day" smallint;

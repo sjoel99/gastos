@@ -15,12 +15,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-# Variáveis dummy só pra build resolver o env.ts (substituídas em runtime)
-ENV DATABASE_URL=postgres://x:x@localhost/x
-ENV AUTH_SECRET=build-time-placeholder-secret-not-used
-ENV RESEND_API_KEY=build-time-placeholder
-ENV EMAIL_FROM=build@example.com
-ENV ALLOWED_EMAILS=build@example.com
 RUN pnpm build
 
 # ---- runner ----
@@ -38,19 +32,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Migrator isolado: ESM não respeita NODE_PATH, então mantemos migrate.mjs
-# junto com seu node_modules em /app/migrator.
-RUN mkdir -p /app/migrator && \
-    echo '{"type":"module","dependencies":{"drizzle-orm":"^0.45","postgres":"^3.4"}}' \
-      > /app/migrator/package.json && \
-    cd /app/migrator && \
-    npm install --omit=dev --no-package-lock --silent
-COPY --from=builder /app/src/db/migrate.mjs /app/migrator/migrate.mjs
-COPY --from=builder /app/drizzle /app/migrator/drizzle
-COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh && chown nextjs:nodejs ./entrypoint.sh
-
 USER nextjs
 EXPOSE 3000
 
-CMD ["./entrypoint.sh"]
+# Landing estática (Next standalone) — sem migrations nem banco.
+CMD ["node", "server.js"]
