@@ -9,23 +9,55 @@ import {
   Users,
   WifiOff,
 } from "lucide-react";
-import { PhoneMockup } from "@/components/landing/phone-mockup";
+import { DeviceFrame } from "@/components/landing/device-frame";
 import { StoreBadges } from "@/components/landing/store-badges";
 
+const SITE_URL = "https://contaleve.sjoel99.com";
+const OG_DESC =
+  "App de controle de gastos e finanças da família: despesas, receitas e saldo. Funciona offline, sem login e de graça. Para iPhone e Android.";
+
 export const metadata: Metadata = {
-  title: "ContaLeve — Suas contas, sem peso",
-  description:
-    "App de controle financeiro da família: despesas, receitas e saldo. Local-first, funciona offline e de graça, sem login. Para Android e iPhone.",
+  metadataBase: new URL(SITE_URL),
+  title: "ContaLeve — Controle de gastos da família, sem peso",
+  description: OG_DESC,
+  keywords: [
+    "controle de gastos",
+    "controle financeiro",
+    "finanças pessoais",
+    "organizar contas",
+    "despesas e receitas",
+    "orçamento familiar",
+    "app de finanças",
+    "planilha de gastos",
+    "controle de despesas",
+    "saúde financeira",
+    "inflação pessoal",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "ContaLeve — Suas contas, sem peso",
-    description:
-      "Controle financeiro da família, local-first e sem peso. Android e iPhone.",
-    url: "https://contaleve.sjoel99.com",
+    title: "ContaLeve — Controle de gastos da família, sem peso",
+    description: OG_DESC,
+    url: SITE_URL,
     siteName: "ContaLeve",
     locale: "pt_BR",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "ContaLeve — Controle de gastos da família, sem peso",
+    description: OG_DESC,
+  },
 };
+
+/** Telas reais do app — usadas no hero e na galeria. */
+const screens = [
+  { key: "1-mes", title: "Visão do mês", text: "Total, pago e o que falta — num relance." },
+  { key: "2-anual", title: "Visão anual", text: "Gastos do ano em barras, com a receita por cima." },
+  { key: "3-saude", title: "Saúde financeira", text: "Uma nota de 0 a 100 sobre suas finanças." },
+  { key: "4-inflacao", title: "Inflação Pessoal", text: "A sua inflação real, não a média do país." },
+  { key: "5-lancamentos", title: "Lançamentos", text: "Cadastre uma vez; repete todo mês." },
+  { key: "6-calendario", title: "Calendário", text: "Todos os vencimentos em um calendário." },
+] as const;
 
 const features = [
   {
@@ -63,6 +95,24 @@ const features = [
 export default function Home() {
   return (
     <main className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "ContaLeve",
+            applicationCategory: "FinanceApplication",
+            operatingSystem: "Android, iOS",
+            description: OG_DESC,
+            url: SITE_URL,
+            inLanguage: "pt-BR",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+            downloadUrl:
+              "https://play.google.com/store/apps/details?id=com.sjoel99.contaleve",
+          }),
+        }}
+      />
       {/* Nav */}
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -110,8 +160,21 @@ export default function Home() {
               Premium.
             </p>
           </div>
-          <div className="flex justify-center md:justify-end">
-            <PhoneMockup />
+          <div className="relative flex h-[420px] items-center justify-center md:h-[560px] md:justify-end">
+            {/* Android atrás, iPhone à frente — mostra as duas plataformas */}
+            <DeviceFrame
+              platform="android"
+              src="/shots/android/1-mes.png"
+              alt="ContaLeve no Android — tela do mês"
+              className="absolute left-2 top-6 w-[150px] -rotate-6 md:left-4 md:w-[210px]"
+            />
+            <DeviceFrame
+              platform="ios"
+              src="/shots/ios/1-mes.png"
+              alt="ContaLeve no iPhone — tela do mês"
+              priority
+              className="relative w-[180px] translate-x-6 rotate-3 md:w-[250px]"
+            />
           </div>
         </div>
       </section>
@@ -139,6 +202,43 @@ export default function Home() {
                 <p className="mt-1.5 text-sm text-muted-foreground">{text}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery — telas reais do app */}
+      <section className="overflow-hidden">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+            O app por dentro
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
+            As mesmas telas no iPhone e no Android — os dados ficam no aparelho e
+            sincronizam quando você quiser.
+          </p>
+          <div className="mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {screens.map((s, i) => {
+              const platform = i % 2 === 0 ? "ios" : "android";
+              return (
+                <figure
+                  key={s.key}
+                  className="flex shrink-0 snap-center flex-col items-center"
+                >
+                  <DeviceFrame
+                    platform={platform}
+                    src={`/shots/${platform}/${s.key}.png`}
+                    alt={`${s.title} — ContaLeve no ${platform === "ios" ? "iPhone" : "Android"}`}
+                    className="w-[210px]"
+                  />
+                  <figcaption className="mt-4 max-w-[210px] text-center">
+                    <span className="block font-semibold">{s.title}</span>
+                    <span className="mt-0.5 block text-sm text-muted-foreground">
+                      {s.text}
+                    </span>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
       </section>
