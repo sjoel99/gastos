@@ -1,37 +1,45 @@
-import { Apple, Play } from "lucide-react";
+/* eslint-disable @next/next/no-img-element */
 
 const PLAY_URL =
   "https://play.google.com/store/apps/details?id=com.sjoel99.contaleve";
 
 /**
- * Botões de download. A Play Store já está no ar; a App Store fica como "em
- * breve" até a versão iOS publicar (troca a `div` por um `a` com a URL quando
- * sair).
+ * Badges das lojas usando o ARTWORK OFICIAL (não recriar — exigência das
+ * diretrizes de marca da Google e da Apple).
+ * - Google Play: badge oficial pt-BR, já no ar e linkado.
+ * - App Store: badge oficial pt-BR, porém DESABILITADO ("Em breve") até o
+ *   app iOS publicar. A diretriz da Apple só permite linkar o badge para a
+ *   página do app na App Store; quando publicar, é só envolver num <a> com a
+ *   URL e remover o selo "Em breve".
+ *
+ * Assets: public/badges/. Altura do Google um tico maior porque o PNG do
+ * Google traz mais "clear space" embutido que o SVG da Apple.
  */
 export function StoreBadges() {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       <a
         href={PLAY_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 rounded-xl bg-foreground px-5 py-3 text-background transition-opacity hover:opacity-90"
+        aria-label="Disponível no Google Play"
+        className="inline-block transition-opacity hover:opacity-85"
       >
-        <Play className="size-6 shrink-0 fill-current" />
-        <span className="flex flex-col leading-tight">
-          <span className="text-[0.65rem] opacity-70">Disponível no</span>
-          <span className="text-base font-semibold">Google Play</span>
-        </span>
+        <img
+          src="/badges/google-play-pt-br.png"
+          alt="Disponível no Google Play"
+          className="h-[54px] w-auto"
+        />
       </a>
 
-      <div
-        className="flex cursor-default items-center gap-3 rounded-xl border border-border bg-card px-5 py-3 text-muted-foreground"
-        aria-disabled
-      >
-        <Apple className="size-6 shrink-0" />
-        <span className="flex flex-col leading-tight">
-          <span className="text-[0.65rem] opacity-70">Em breve na</span>
-          <span className="text-base font-semibold">App Store</span>
+      <div className="relative inline-block" aria-label="Em breve na App Store">
+        <img
+          src="/badges/app-store-pt-br.svg"
+          alt="Em breve na App Store"
+          className="h-[40px] w-auto opacity-50 grayscale"
+        />
+        <span className="absolute -right-1 -top-2 rounded-full bg-foreground px-2 py-0.5 text-[0.6rem] font-semibold text-background shadow-sm">
+          Em breve
         </span>
       </div>
     </div>
