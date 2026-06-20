@@ -7,7 +7,7 @@ import Image from "next/image";
  */
 const DIMS = {
   ios: { w: 1206, h: 2622, radius: "rounded-[2.6rem]", border: "border-[12px]" },
-  android: { w: 1080, h: 1920, radius: "rounded-[1.9rem]", border: "border-[11px]" },
+  android: { w: 1080, h: 2400, radius: "rounded-[2.2rem]", border: "border-[11px]" },
 } as const;
 
 export function DeviceFrame({

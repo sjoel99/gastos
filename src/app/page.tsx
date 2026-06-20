@@ -41,11 +41,15 @@ export const metadata: Metadata = {
     siteName: "ContaLeve",
     locale: "pt_BR",
     type: "website",
+    images: [
+      { url: "/og.png", width: 1200, height: 630, alt: "ContaLeve — controle de gastos no iPhone e Android" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ContaLeve — Controle de gastos da família, sem peso",
     description: OG_DESC,
+    images: ["/og.png"],
   },
 };
 
@@ -57,6 +61,30 @@ const screens = [
   { key: "4-inflacao", title: "Inflação Pessoal", text: "A sua inflação real, não a média do país." },
   { key: "5-lancamentos", title: "Lançamentos", text: "Cadastre uma vez; repete todo mês." },
   { key: "6-calendario", title: "Calendário", text: "Todos os vencimentos em um calendário." },
+] as const;
+
+/** Perguntas frequentes — conteúdo indexável + rich snippet (FAQPage). */
+const faqs = [
+  {
+    q: "O ContaLeve é gratuito?",
+    a: "Sim. O plano grátis tem o controle de gastos completo — despesas, receitas, saldo do mês, visão anual e calendário de vencimentos. O ContaLeve Premium é opcional e adiciona backup na nuvem, compartilhamento entre aparelhos, saúde financeira e inflação pessoal.",
+  },
+  {
+    q: "Funciona offline?",
+    a: "Funciona. Os dados ficam no seu próprio aparelho e o app abre direto, sem login e sem internet. Nada é enviado para servidores no modo grátis.",
+  },
+  {
+    q: "Está disponível para iPhone e Android?",
+    a: "O ContaLeve já está na Google Play para Android e chega em breve à App Store para iPhone. As duas versões compartilham o mesmo orçamento quando você ativa a sincronização.",
+  },
+  {
+    q: "Dá para usar com a família?",
+    a: "Sim. Com o Premium, um código de convite junta dois aparelhos no mesmo espaço — marido e esposa veem e atualizam as mesmas contas, mesmo em sistemas diferentes.",
+  },
+  {
+    q: "Meus dados financeiros ficam seguros?",
+    a: "Ficam. Por padrão tudo é local, sem rastreadores e sem coleta de dados. A sincronização na nuvem só acontece se você ativar o Premium e fizer login, com o seu aval.",
+  },
 ] as const;
 
 const features = [
@@ -246,6 +274,37 @@ export default function Home() {
             })}
           </div>
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-border/60 bg-card/40">
+        <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+          <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+            Perguntas frequentes
+          </h2>
+          <dl className="mt-10 divide-y divide-border">
+            {faqs.map(({ q, a }) => (
+              <div key={q} className="py-5">
+                <dt className="font-semibold">{q}</dt>
+                <dd className="mt-2 text-muted-foreground">{a}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqs.map(({ q, a }) => ({
+                "@type": "Question",
+                name: q,
+                acceptedAnswer: { "@type": "Answer", text: a },
+              })),
+            }),
+          }}
+        />
       </section>
 
       {/* Privacy emphasis */}
