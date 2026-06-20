@@ -160,21 +160,21 @@ export default function Home() {
               Premium.
             </p>
           </div>
-          <div className="relative flex h-[360px] items-center justify-center md:h-[540px] md:justify-end">
-            {/* Android atrás, iPhone à frente — mesma altura (parecem do mesmo
-                tamanho, como dois celulares reais lado a lado) */}
+          <div className="relative flex h-[380px] items-end justify-center md:h-[560px] md:justify-end">
+            {/* Android atrás, iPhone à frente — tamanho original (mesma escala):
+                largura do Android = iOS × 1080/1206; alinhados pela base */}
             <DeviceFrame
               platform="android"
               src="/shots/android/1-mes.png"
               alt="ContaLeve no Android — tela do mês"
-              className="absolute left-0 top-2 h-[290px] -rotate-6 md:h-[460px]"
+              className="absolute bottom-0 left-0 w-[136px] -rotate-6 md:w-[224px]"
             />
             <DeviceFrame
               platform="ios"
               src="/shots/ios/1-mes.png"
               alt="ContaLeve no iPhone — tela do mês"
               priority
-              className="relative h-[300px] translate-x-10 rotate-3 md:h-[470px]"
+              className="relative w-[152px] translate-x-10 rotate-3 md:w-[250px]"
             />
           </div>
         </div>
@@ -223,15 +223,19 @@ export default function Home() {
               return (
                 <figure
                   key={s.key}
-                  className="flex w-[250px] shrink-0 snap-center flex-col items-center"
+                  className="flex w-[220px] shrink-0 snap-center flex-col items-center"
                 >
-                  <DeviceFrame
-                    platform={platform}
-                    src={`/shots/${platform}/${s.key}.png`}
-                    alt={`${s.title} — ContaLeve no ${platform === "ios" ? "iPhone" : "Android"}`}
-                    className="h-[440px]"
-                  />
-                  <figcaption className="mt-4 max-w-[210px] text-center">
+                  {/* área de altura fixa, telefone alinhado pela base — mantém o
+                      tamanho original (mesma escala) e as legendas alinhadas */}
+                  <div className="flex h-[440px] items-end">
+                    <DeviceFrame
+                      platform={platform}
+                      src={`/shots/${platform}/${s.key}.png`}
+                      alt={`${s.title} — ContaLeve no ${platform === "ios" ? "iPhone" : "Android"}`}
+                      className={platform === "ios" ? "w-[200px]" : "w-[179px]"}
+                    />
+                  </div>
+                  <figcaption className="mt-4 max-w-[200px] text-center">
                     <span className="block font-semibold">{s.title}</span>
                     <span className="mt-0.5 block text-sm text-muted-foreground">
                       {s.text}
