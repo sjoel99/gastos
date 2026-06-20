@@ -160,20 +160,21 @@ export default function Home() {
               Premium.
             </p>
           </div>
-          <div className="relative flex h-[420px] items-center justify-center md:h-[560px] md:justify-end">
-            {/* Android atrás, iPhone à frente — mostra as duas plataformas */}
+          <div className="relative flex h-[360px] items-center justify-center md:h-[540px] md:justify-end">
+            {/* Android atrás, iPhone à frente — mesma altura (parecem do mesmo
+                tamanho, como dois celulares reais lado a lado) */}
             <DeviceFrame
               platform="android"
               src="/shots/android/1-mes.png"
               alt="ContaLeve no Android — tela do mês"
-              className="absolute left-2 top-6 w-[150px] -rotate-6 md:left-4 md:w-[210px]"
+              className="absolute left-0 top-2 h-[290px] -rotate-6 md:h-[460px]"
             />
             <DeviceFrame
               platform="ios"
               src="/shots/ios/1-mes.png"
               alt="ContaLeve no iPhone — tela do mês"
               priority
-              className="relative w-[180px] translate-x-6 rotate-3 md:w-[250px]"
+              className="relative h-[300px] translate-x-10 rotate-3 md:h-[470px]"
             />
           </div>
         </div>
@@ -222,13 +223,13 @@ export default function Home() {
               return (
                 <figure
                   key={s.key}
-                  className="flex shrink-0 snap-center flex-col items-center"
+                  className="flex w-[250px] shrink-0 snap-center flex-col items-center"
                 >
                   <DeviceFrame
                     platform={platform}
                     src={`/shots/${platform}/${s.key}.png`}
                     alt={`${s.title} — ContaLeve no ${platform === "ios" ? "iPhone" : "Android"}`}
-                    className="w-[210px]"
+                    className="h-[440px]"
                   />
                   <figcaption className="mt-4 max-w-[210px] text-center">
                     <span className="block font-semibold">{s.title}</span>

@@ -24,9 +24,12 @@ export function DeviceFrame({
   className?: string;
 }) {
   const d = DIMS[platform];
+  // Dimensiona pela ALTURA (className deve passar h-*): assim iPhone e Android
+  // — que têm proporções diferentes — aparecem do mesmo tamanho, como dois
+  // celulares reais lado a lado. A largura segue a proporção de cada aparelho.
   return (
     <div
-      className={`overflow-hidden border-neutral-900 bg-neutral-900 shadow-2xl ring-1 ring-black/10 ${d.radius} ${d.border} ${className ?? ""}`}
+      className={`inline-block overflow-hidden border-neutral-900 bg-neutral-900 shadow-2xl ring-1 ring-black/10 ${d.radius} ${d.border} ${className ?? ""}`}
     >
       <Image
         src={src}
@@ -34,8 +37,8 @@ export function DeviceFrame({
         width={d.w}
         height={d.h}
         priority={priority}
-        sizes="(max-width: 768px) 70vw, 280px"
-        className="block h-auto w-full"
+        sizes="(max-width: 768px) 60vw, 260px"
+        className="block h-full w-auto"
       />
     </div>
   );
