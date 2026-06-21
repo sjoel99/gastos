@@ -1,8 +1,8 @@
 {
-  "id": "2026-05-inflacao-pessoal",
-  "title": "Novidade: Inflação Pessoal",
-  "message": "Agora o ContaLeve calcula a SUA inflação real a partir dos seus gastos e compara com o IPCA oficial do IBGE. Veja na aba Análise → Saúde (Premium).",
+  "id": "2026-06-assistente-ia",
+  "title": "Novidade: Assistente de IA",
+  "message": "Agora você pergunta sobre suas finanças em linguagem natural e o ContaLeve responde com base nos seus lançamentos — pra onde foi seu dinheiro, onde economizar, se o mês fecha no positivo. Toque no ✨ na tela Mês (Premium). Também dá pra travar o app com biometria ou PIN em Ajustes → Privacidade.",
   "actionLabel": null,
   "actionUrl": null,
-  "minVersionCode": null
+  "minVersionCode": 10
 }
