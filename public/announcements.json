@@ -1,8 +1,8 @@
 {
-  "id": "2026-06-assistente-ia",
-  "title": "Novidade: Assistente de IA",
-  "message": "Agora você pergunta sobre suas finanças em linguagem natural e o ContaLeve responde com base nos seus lançamentos — pra onde foi seu dinheiro, onde economizar, se o mês fecha no positivo. Toque no ✨ na tela Mês (Premium). Também dá pra travar o app com biometria ou PIN em Ajustes → Privacidade.",
+  "id": "2026-06-categorias-automaticas",
+  "title": "Novidade: categorias automáticas",
+  "message": "Ao importar uma fatura ou extrato (CSV/OFX), o ContaLeve agora sugere a categoria de cada lançamento pra você — é só conferir e ajustar antes de salvar. Grátis pra todos, em Ajustes → Dados → Importar. A tela Mês também ficou mais organizada: as listas Receitas e Despesas podem ser recolhidas, e o que ainda não foi pago aparece primeiro.",
   "actionLabel": null,
   "actionUrl": null,
-  "minVersionCode": 10
+  "minVersionCode": 11
 }
