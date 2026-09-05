@@ -56,6 +56,25 @@ docker compose up -d --build
 Servida em `contaleve.sjoel99.com` via Cloudflare Tunnel (DNS + TLS pela
 Cloudflare; aponta para `http://<host>:3000`).
 
+### Deploy numa VPS (recomendado)
+
+Kit em [`deploy/vps/`](deploy/vps/): landing + conector do **Cloudflare Tunnel**
+no mesmo compose. Nenhuma porta aberta além do SSH; DNS e TLS continuam na
+Cloudflare.
+
+1. Em **Cloudflare Zero Trust → Networks → Tunnels**, crie um túnel (ou reaproveite
+   o do PC) e copie o token. Em *Public hostname*, aponte
+   `contaleve.sjoel99.com` → `http://app:3000`.
+2. Na VPS (Ubuntu/Debian, 1 vCPU / 1 GB basta):
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/sjoel99/gastos/main/deploy/vps/bootstrap.sh \
+     | bash -s -- <TUNNEL_TOKEN>
+   ```
+3. Atualizações: `~/contaleve-site/deploy/vps/update.sh` (pull + rebuild).
+
+O `public/announcements.json` e a `/privacy` (URL da política na Play) passam
+a depender só da VPS — sem PC ligado.
+
 ### Atualizar em produção
 
 ```bash

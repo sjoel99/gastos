@@ -6,8 +6,8 @@ import {
   HeartPulse,
   ShieldCheck,
   TrendingUp,
-  Users,
   WifiOff,
+  Receipt,
 } from "lucide-react";
 import { DeviceFrame } from "@/components/landing/device-frame";
 import { StoreBadges } from "@/components/landing/store-badges";
@@ -67,7 +67,7 @@ const screens = [
 const faqs = [
   {
     q: "O ContaLeve é gratuito?",
-    a: "Sim. O plano grátis tem o controle de gastos completo — despesas, receitas, saldo do mês, visão anual e calendário de vencimentos. O ContaLeve Premium é opcional e adiciona backup na nuvem, compartilhamento entre aparelhos, saúde financeira e inflação pessoal.",
+    a: "Sim. O plano grátis tem o controle de gastos completo — despesas, receitas, saldo do mês, visão anual, calendário de vencimentos, importação de fatura e comprovante que vira conta paga. O ContaLeve Premium é opcional e adiciona backup na nuvem, compartilhamento entre aparelhos, saúde financeira e inflação pessoal.",
   },
   {
     q: "Funciona offline?",
@@ -80,6 +80,10 @@ const faqs = [
   {
     q: "Dá para usar com a família?",
     a: "Sim. Com o Premium, um código de convite junta dois aparelhos no mesmo espaço — marido e esposa veem e atualizam as mesmas contas, mesmo em sistemas diferentes.",
+  },
+  {
+    q: "Como funciona o comprovante?",
+    a: "Depois de pagar no app do banco, toque em Compartilhar e escolha o ContaLeve. Ele lê valor, data e favorecido no próprio celular, sugere a conta do mês e marca como paga com um toque. O comprovante fica guardado no lançamento. Nada é enviado para servidores.",
   },
   {
     q: "Meus dados financeiros ficam seguros?",
@@ -114,9 +118,9 @@ const features = [
     text: "Os dados vivem no seu aparelho. O app abre direto, sem login e sem internet. De graça.",
   },
   {
-    icon: Users,
-    title: "Compartilhe com a família",
-    text: "Um código de convite junta dois aparelhos no mesmo espaço — Android e iPhone, no mesmo orçamento.",
+    icon: Receipt,
+    title: "Comprovante vira conta paga",
+    text: "Pagou o Pix ou o boleto? Compartilhe o comprovante do app do banco e o ContaLeve marca a conta como paga — lendo tudo no seu aparelho.",
   },
 ];
 

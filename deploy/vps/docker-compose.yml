@@ -1,0 +1,46 @@
+# Deploy do site do ContaLeve numa VPS.
+#
+# Dois serviços: a landing (Next standalone) e o conector do Cloudflare Tunnel.
+# O túnel liga a VPS ao domínio contaleve.sjoel99.com sem abrir porta nenhuma
+# no firewall e sem certificado pra gerenciar — DNS e TLS seguem na Cloudflare,
+# como já era no PC de casa.
+#
+# Uso:  cp .env.example .env  →  preencher TUNNEL_TOKEN  →  docker compose up -d
+services:
+  app:
+    build:
+      context: ../..
+    image: contaleve-landing:latest
+    restart: unless-stopped
+    expose:
+      - "3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      # Sem token o conector não sobe (fica reiniciando) — o site segue no ar
+      # internamente; preencha o .env e rode `docker compose up -d tunnel`.
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
