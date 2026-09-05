@@ -42,6 +42,13 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* App indexing: associa o site à ficha da Play (Google mostra "Abrir no app"). */}
+        <link
+          rel="alternate"
+          href="android-app://com.sjoel99.contaleve/https/contaleve.sjoel99.com/"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>

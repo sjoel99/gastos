@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 const PLAY_URL =
-  "https://play.google.com/store/apps/details?id=com.sjoel99.contaleve";
+  "https://play.google.com/store/apps/details?id=com.sjoel99.contaleve&referrer=utm_source%3Dcontaleve_site%26utm_medium%3Dlanding%26utm_campaign%3Dbadge";
 
 /**
  * Badges das lojas usando o ARTWORK OFICIAL (não recriar — exigência das
